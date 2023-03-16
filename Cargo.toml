@@ -1,2 +1,2 @@
 [workspace]
-members = ["scadder_math"]
+members = ["scadder_math", "scadder"]
