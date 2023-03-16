@@ -23,6 +23,35 @@
 
 use crate::{dcos, dsin, Pt4};
 
+#[derive(Clone)]
+pub struct Pt3s {
+  inner: Vec<Pt3>,
+}
+
+impl std::ops::Deref for Pt3s {
+  type Target = Vec<Pt3>;
+
+  fn deref(&self) -> &Self::Target {
+    &self.inner
+  }
+}
+
+impl std::ops::DerefMut for Pt3s {
+  fn deref_mut(&mut self) -> &mut Self::Target {
+    &mut self.inner
+  }
+}
+
+impl std::fmt::Display for Pt3s {
+  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    write!(f, "[")?;
+    for i in 0..self.len() - 1 {
+      write!(f, "{},", self[i])?
+    }
+    write!(f, "{}]", self[self.len() - 1])
+  }
+}
+
 #[derive(Clone, Copy, Debug, Default, PartialEq)]
 pub struct Pt3 {
   pub x: f64,
@@ -32,7 +61,7 @@ pub struct Pt3 {
 
 impl std::fmt::Display for Pt3 {
   fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-    write!(f, "[ {}, {}, {} ]", self.x, self.y, self.z)
+    write!(f, "[{}, {}, {}]", self.x, self.y, self.z)
   }
 }
 

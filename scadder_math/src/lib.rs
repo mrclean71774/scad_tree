@@ -27,7 +27,13 @@ mod pt3;
 mod pt4;
 mod rng;
 
-pub use crate::{mt4::Mt4, pt2::Pt2, pt3::Pt3, pt4::Pt4, rng::MersenneTwister};
+pub use crate::{
+  mt4::Mt4,
+  pt2::{Pt2, Pt2s},
+  pt3::{Pt3, Pt3s},
+  pt4::{Pt4, Pt4s},
+  rng::MersenneTwister,
+};
 
 /// Returns the sine of degrees
 #[inline(always)]
