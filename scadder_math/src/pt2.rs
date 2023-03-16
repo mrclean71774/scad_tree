@@ -23,7 +23,7 @@
 
 use crate::{dcos, dsin, Pt3};
 
-#[derive(Clone)]
+#[derive(Clone, PartialEq)]
 pub struct Pt2s {
   inner: Vec<Pt2>,
 }
