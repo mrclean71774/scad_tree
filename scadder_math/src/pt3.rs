@@ -52,6 +52,16 @@ impl std::fmt::Display for Pt3s {
   }
 }
 
+impl Pt3s {
+  pub fn new() -> Self {
+    Self { inner: Vec::new() }
+  }
+
+  pub fn from_pt3s(pt2s: Vec<Pt3>) -> Self {
+    Self { inner: pt2s }
+  }
+}
+
 #[derive(Clone, Copy, Debug, Default, PartialEq)]
 pub struct Pt3 {
   pub x: f64,
