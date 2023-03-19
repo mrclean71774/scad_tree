@@ -28,51 +28,51 @@ mod pt4;
 mod rng;
 
 pub use crate::{
-  mt4::Mt4,
-  pt2::{Pt2, Pt2s},
-  pt3::{Pt3, Pt3s},
-  pt4::{Pt4, Pt4s},
-  rng::MersenneTwister,
+    mt4::Mt4,
+    pt2::{Pt2, Pt2s},
+    pt3::{Pt3, Pt3s},
+    pt4::{Pt4, Pt4s},
+    rng::MersenneTwister,
 };
 
 /// Returns the sine of degrees
 #[inline(always)]
 pub fn dsin(degrees: f64) -> f64 {
-  degrees.to_radians().sin()
+    degrees.to_radians().sin()
 }
 
 /// Returns the cosine of degrees
 #[inline(always)]
 pub fn dcos(degrees: f64) -> f64 {
-  degrees.to_radians().cos()
+    degrees.to_radians().cos()
 }
 
 /// Returns the tangent of degrees
 #[inline(always)]
 pub fn dtan(degrees: f64) -> f64 {
-  degrees.to_radians().tan()
+    degrees.to_radians().tan()
 }
 
 /// Returns the arc-sine of degrees
 #[inline(always)]
 pub fn dasin(degrees: f64) -> f64 {
-  degrees.to_radians().asin()
+    degrees.to_radians().asin()
 }
 
 /// Returns the arc-cosine of degrees
 #[inline(always)]
 pub fn dacos(degrees: f64) -> f64 {
-  degrees.to_radians().acos()
+    degrees.to_radians().acos()
 }
 
 /// Returns the arc-tangent of degrees
 #[inline(always)]
 pub fn datan(degrees: f64) -> f64 {
-  degrees.to_radians().atan()
+    degrees.to_radians().atan()
 }
 
 /// Returns true if a and b are within epsilon
 #[inline(always)]
 pub fn approx_eq(a: f64, b: f64, epsilon: f64) -> bool {
-  (a - b).abs() < epsilon
+    (a - b).abs() < epsilon
 }

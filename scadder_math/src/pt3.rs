@@ -25,213 +25,213 @@ use crate::{dcos, dsin, Pt4};
 
 #[derive(Clone, PartialEq)]
 pub struct Pt3s {
-  inner: Vec<Pt3>,
+    inner: Vec<Pt3>,
 }
 
 impl std::ops::Deref for Pt3s {
-  type Target = Vec<Pt3>;
+    type Target = Vec<Pt3>;
 
-  fn deref(&self) -> &Self::Target {
-    &self.inner
-  }
+    fn deref(&self) -> &Self::Target {
+        &self.inner
+    }
 }
 
 impl std::ops::DerefMut for Pt3s {
-  fn deref_mut(&mut self) -> &mut Self::Target {
-    &mut self.inner
-  }
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.inner
+    }
 }
 
 impl std::fmt::Display for Pt3s {
-  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-    write!(f, "[")?;
-    for i in 0..self.len() - 1 {
-      write!(f, "{},", self[i])?
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "[")?;
+        for i in 0..self.len() - 1 {
+            write!(f, "{},", self[i])?
+        }
+        write!(f, "{}]", self[self.len() - 1])
     }
-    write!(f, "{}]", self[self.len() - 1])
-  }
 }
 
 impl Pt3s {
-  pub fn new() -> Self {
-    Self { inner: Vec::new() }
-  }
+    pub fn new() -> Self {
+        Self { inner: Vec::new() }
+    }
 
-  pub fn from_pt3s(pt2s: Vec<Pt3>) -> Self {
-    Self { inner: pt2s }
-  }
+    pub fn from_pt3s(pt2s: Vec<Pt3>) -> Self {
+        Self { inner: pt2s }
+    }
 }
 
 #[derive(Clone, Copy, Debug, Default, PartialEq)]
 pub struct Pt3 {
-  pub x: f64,
-  pub y: f64,
-  pub z: f64,
+    pub x: f64,
+    pub y: f64,
+    pub z: f64,
 }
 
 impl std::fmt::Display for Pt3 {
-  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-    write!(f, "[{}, {}, {}]", self.x, self.y, self.z)
-  }
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "[{}, {}, {}]", self.x, self.y, self.z)
+    }
 }
 
 impl std::ops::Index<usize> for Pt3 {
-  type Output = f64;
+    type Output = f64;
 
-  fn index(&self, index: usize) -> &Self::Output {
-    match index {
-      0 => &self.x,
-      1 => &self.y,
-      2 => &self.z,
-      _ => panic!("Index {} is out of bounds.", index),
+    fn index(&self, index: usize) -> &Self::Output {
+        match index {
+            0 => &self.x,
+            1 => &self.y,
+            2 => &self.z,
+            _ => panic!("Index {} is out of bounds.", index),
+        }
     }
-  }
 }
 
 impl std::ops::IndexMut<usize> for Pt3 {
-  fn index_mut(&mut self, index: usize) -> &mut Self::Output {
-    match index {
-      0 => &mut self.x,
-      1 => &mut self.y,
-      2 => &mut self.z,
-      _ => panic!("Index {} is out of bounds.", index),
+    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
+        match index {
+            0 => &mut self.x,
+            1 => &mut self.y,
+            2 => &mut self.z,
+            _ => panic!("Index {} is out of bounds.", index),
+        }
     }
-  }
 }
 
 impl std::ops::Add for Pt3 {
-  type Output = Self;
+    type Output = Self;
 
-  fn add(self, rhs: Self) -> Self::Output {
-    Self::new(self.x + rhs.x, self.y + rhs.y, self.z + rhs.z)
-  }
+    fn add(self, rhs: Self) -> Self::Output {
+        Self::new(self.x + rhs.x, self.y + rhs.y, self.z + rhs.z)
+    }
 }
 
 impl std::ops::AddAssign for Pt3 {
-  fn add_assign(&mut self, rhs: Self) {
-    *self = *self + rhs;
-  }
+    fn add_assign(&mut self, rhs: Self) {
+        *self = *self + rhs;
+    }
 }
 
 impl std::ops::Sub for Pt3 {
-  type Output = Self;
+    type Output = Self;
 
-  fn sub(self, rhs: Self) -> Self::Output {
-    Self::new(self.x - rhs.x, self.y - rhs.y, self.z - rhs.z)
-  }
+    fn sub(self, rhs: Self) -> Self::Output {
+        Self::new(self.x - rhs.x, self.y - rhs.y, self.z - rhs.z)
+    }
 }
 
 impl std::ops::SubAssign for Pt3 {
-  fn sub_assign(&mut self, rhs: Self) {
-    *self = *self - rhs;
-  }
+    fn sub_assign(&mut self, rhs: Self) {
+        *self = *self - rhs;
+    }
 }
 
 impl std::ops::Mul<f64> for Pt3 {
-  type Output = Self;
+    type Output = Self;
 
-  fn mul(self, rhs: f64) -> Self::Output {
-    Self::new(self.x * rhs, self.y * rhs, self.z * rhs)
-  }
+    fn mul(self, rhs: f64) -> Self::Output {
+        Self::new(self.x * rhs, self.y * rhs, self.z * rhs)
+    }
 }
 
 impl std::ops::MulAssign<f64> for Pt3 {
-  fn mul_assign(&mut self, rhs: f64) {
-    *self = *self * rhs;
-  }
+    fn mul_assign(&mut self, rhs: f64) {
+        *self = *self * rhs;
+    }
 }
 
 impl std::ops::Div<f64> for Pt3 {
-  type Output = Self;
+    type Output = Self;
 
-  fn div(self, rhs: f64) -> Self::Output {
-    Self::new(self.x / rhs, self.y / rhs, self.z / rhs)
-  }
+    fn div(self, rhs: f64) -> Self::Output {
+        Self::new(self.x / rhs, self.y / rhs, self.z / rhs)
+    }
 }
 
 impl std::ops::DivAssign<f64> for Pt3 {
-  fn div_assign(&mut self, rhs: f64) {
-    *self = *self / rhs;
-  }
+    fn div_assign(&mut self, rhs: f64) {
+        *self = *self / rhs;
+    }
 }
 
 impl std::ops::Neg for Pt3 {
-  type Output = Self;
+    type Output = Self;
 
-  fn neg(self) -> Self::Output {
-    self * -1.0
-  }
+    fn neg(self) -> Self::Output {
+        self * -1.0
+    }
 }
 
 impl Pt3 {
-  pub fn new(x: f64, y: f64, z: f64) -> Self {
-    Self { x, y, z }
-  }
+    pub fn new(x: f64, y: f64, z: f64) -> Self {
+        Self { x, y, z }
+    }
 
-  pub fn dot(self, rhs: Self) -> f64 {
-    self.x * rhs.x + self.y * rhs.y + self.z * rhs.z
-  }
+    pub fn dot(self, rhs: Self) -> f64 {
+        self.x * rhs.x + self.y * rhs.y + self.z * rhs.z
+    }
 
-  pub fn cross(self, rhs: Self) -> Self {
-    Pt3::new(
-      self.y * rhs.z - self.z * rhs.y,
-      self.z * rhs.x - self.x * rhs.z,
-      self.x * rhs.y - self.y * rhs.x,
-    )
-  }
+    pub fn cross(self, rhs: Self) -> Self {
+        Pt3::new(
+            self.y * rhs.z - self.z * rhs.y,
+            self.z * rhs.x - self.x * rhs.z,
+            self.x * rhs.y - self.y * rhs.x,
+        )
+    }
 
-  pub fn len2(self) -> f64 {
-    self.dot(self)
-  }
+    pub fn len2(self) -> f64 {
+        self.dot(self)
+    }
 
-  pub fn len(self) -> f64 {
-    self.len2().sqrt()
-  }
+    pub fn len(self) -> f64 {
+        self.len2().sqrt()
+    }
 
-  pub fn normalize(&mut self) {
-    *self /= self.len();
-  }
+    pub fn normalize(&mut self) {
+        *self /= self.len();
+    }
 
-  pub fn normalized(self) -> Self {
-    let l = self.len();
-    Self::new(self.x / l, self.y / l, self.z / l)
-  }
+    pub fn normalized(self) -> Self {
+        let l = self.len();
+        Self::new(self.x / l, self.y / l, self.z / l)
+    }
 
-  pub fn rotated_x(self, degrees: f64) -> Self {
-    let s = dsin(degrees);
-    let c = dcos(degrees);
-    Self::new(self.x, self.y * c - self.z * s, self.y * s + self.z * c)
-  }
+    pub fn rotated_x(self, degrees: f64) -> Self {
+        let s = dsin(degrees);
+        let c = dcos(degrees);
+        Self::new(self.x, self.y * c - self.z * s, self.y * s + self.z * c)
+    }
 
-  pub fn rotate_x(&mut self, degrees: f64) {
-    *self = self.rotated_x(degrees);
-  }
+    pub fn rotate_x(&mut self, degrees: f64) {
+        *self = self.rotated_x(degrees);
+    }
 
-  pub fn rotated_y(self, degrees: f64) -> Self {
-    let s = dsin(degrees);
-    let c = dcos(degrees);
-    Self::new(self.x * c - self.z * s, self.y, self.x * s + self.z * c)
-  }
+    pub fn rotated_y(self, degrees: f64) -> Self {
+        let s = dsin(degrees);
+        let c = dcos(degrees);
+        Self::new(self.x * c - self.z * s, self.y, self.x * s + self.z * c)
+    }
 
-  pub fn rotate_y(&mut self, degrees: f64) {
-    *self = self.rotated_y(degrees);
-  }
+    pub fn rotate_y(&mut self, degrees: f64) {
+        *self = self.rotated_y(degrees);
+    }
 
-  pub fn rotated_z(self, degrees: f64) -> Self {
-    let s = dsin(degrees);
-    let c = dcos(degrees);
-    Self::new(self.x * c - self.y * s, self.x * s + self.y * c, self.z)
-  }
+    pub fn rotated_z(self, degrees: f64) -> Self {
+        let s = dsin(degrees);
+        let c = dcos(degrees);
+        Self::new(self.x * c - self.y * s, self.x * s + self.y * c, self.z)
+    }
 
-  pub fn rotate_z(&mut self, degrees: f64) {
-    *self = self.rotated_z(degrees);
-  }
+    pub fn rotate_z(&mut self, degrees: f64) {
+        *self = self.rotated_z(degrees);
+    }
 
-  pub fn lerp(self, b: Self, t: f64) -> Self {
-    self + (b - self) * t
-  }
+    pub fn lerp(self, b: Self, t: f64) -> Self {
+        self + (b - self) * t
+    }
 
-  pub fn as_pt4(self, w: f64) -> Pt4 {
-    Pt4::new(self.x, self.y, self.z, w)
-  }
+    pub fn as_pt4(self, w: f64) -> Pt4 {
+        Pt4::new(self.x, self.y, self.z, w)
+    }
 }
