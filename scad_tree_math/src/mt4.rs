@@ -300,8 +300,6 @@ impl Mt4 {
         )
     }
 
-    // I don't understand this yet but this one maps the z axis to the axis
-    // from eye to center, it's used to make the line segments in EuclideanSpace
     pub fn look_at_matrix_lh(eye: Pt3, center: Pt3, up: Pt3) -> Self {
         let mut f = center - eye;
         f = f.normalized();
