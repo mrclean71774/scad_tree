@@ -57,6 +57,12 @@ impl Pt4s {
         Self { inner: Vec::new() }
     }
 
+    pub fn with_capacity(capacity: usize) -> Self {
+        Self {
+            inner: Vec::with_capacity(capacity),
+        }
+    }
+
     pub fn from_pt4s(pt2s: Vec<Pt4>) -> Self {
         Self { inner: pt2s }
     }
