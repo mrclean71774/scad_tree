@@ -21,10 +21,7 @@
 // SOFTWARE.
 //
 
-use {
-    crate::{Faces, Paths, Pt2, Pt2s, Pt3, Pt3s, Pt4},
-    std::io::Write,
-};
+use {crate::prelude::*, std::io::Write};
 
 /// The supported OpenSCAD operations.
 #[derive(Clone, PartialEq)]
@@ -166,6 +163,22 @@ impl Scad {
         let mut file = std::fs::File::create(path).unwrap();
         file.write(s.as_bytes()).unwrap();
         file.flush().unwrap();
+    }
+}
+
+impl std::ops::Sub for Scad {
+    type Output = Self;
+
+    fn sub(self, rhs: Self) -> Self::Output {
+        difference!(self; rhs;)
+    }
+}
+
+impl std::ops::Add for Scad {
+    type Output = Self;
+
+    fn add(self, rhs: Self) -> Self::Output {
+        union!(self; rhs;)
     }
 }
 
