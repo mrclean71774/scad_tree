@@ -38,7 +38,7 @@ pub mod prelude {
 
 pub use {
     scad::{Scad, ScadColor, ScadOp, TextDirection, TextHalign, TextParams, TextValign},
-    scadder_math::{
+    scad_tree_math::{
         approx_eq, dacos, dasin, datan, dcos, dsin, dtan, MersenneTwister, Mt4, Pt2, Pt2s, Pt3,
         Pt3s, Pt4, Pt4s,
     },

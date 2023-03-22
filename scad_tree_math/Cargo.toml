@@ -1,5 +1,5 @@
 [package]
-name = "scadder_math"
+name = "scad_tree_math"
 version = "0.0.1"
 edition = "2021"
 
