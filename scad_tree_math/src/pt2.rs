@@ -66,6 +66,12 @@ impl Pt2s {
     pub fn from_pt2s(pt2s: Vec<Pt2>) -> Self {
         Self { inner: pt2s }
     }
+
+    pub fn translate(&mut self, point: Pt2) {
+        for pt in self.iter_mut() {
+            *pt = *pt + point
+        }
+    }
 }
 
 #[derive(Clone, Copy, Debug, Default, PartialEq)]

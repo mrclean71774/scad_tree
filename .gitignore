@@ -1,3 +1,4 @@
 target/
 *.scad
 Cargo.lock
+.vscode/

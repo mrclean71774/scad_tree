@@ -21,27 +21,33 @@
 // SOFTWARE.
 //
 
+pub mod dim2;
 mod scad;
+mod triangulate;
+mod viewer;
 
 pub mod prelude {
     pub use {
         crate::{
-            circle, color, cube, cylinder, difference, hull, import, intersection, linear_extrude,
-            minkowski, mirror, polygon, polyhedron, projection, resize, rotate, rotate_extrude,
-            scad_file, scale, sphere, square, surface, text, translate, union, Faces, Indices,
-            Paths, Pt2, Pt2s, Pt3, Pt3s, Pt4, Scad, ScadColor, ScadOp, TextDirection, TextHalign,
-            TextParams, TextValign,
+            circle, color, cube, cylinder, difference, dim2, fat_thread, hull, import,
+            intersection, linear_extrude, minkowski, mirror, polygon, polyhedron, projection,
+            resize, rotate, rotate_extrude, scad_file, scale, sphere, square, surface, text,
+            translate, union, Faces, Indices, Paths, Pt2, Pt2s, Pt3, Pt3s, Pt4, Scad, ScadColor,
+            ScadOp, TextDirection, TextHalign, TextParams, TextValign,
         },
         std::io::Write,
     };
 }
 
 pub use {
+    dim2::{CubicBezier2D, QuadraticBezier2D},
     scad::{Scad, ScadColor, ScadOp, TextDirection, TextHalign, TextParams, TextValign},
     scad_tree_math::{
         approx_eq, dacos, dasin, datan, dcos, dsin, dtan, MersenneTwister, Mt4, Pt2, Pt2s, Pt3,
         Pt3s, Pt4, Pt4s,
     },
+    triangulate::{triangulate2d, triangulate3d},
+    viewer::Viewer,
 };
 
 #[derive(Clone, PartialEq)]
@@ -127,3 +133,13 @@ impl Paths {
 }
 
 pub type Faces = Paths;
+
+#[macro_export]
+macro_rules! fat_thread {
+    ($code:block) => {
+        std::thread::Builder::new()
+            .stack_size(32 * 1024 * 1024)
+            .spawn(|| $code)
+            .unwrap()
+    };
+}

@@ -698,54 +698,69 @@ impl Default for TextParams {
 #[macro_export]
 macro_rules! scad_file {
     ($path:expr, fa=$fa:expr, fs=$fs:expr, $($child:expr);+;) => {
-       let children = vec![$($child,)+];
-       let mut file = std::fs::File::create($path).unwrap();
-       file.write(format!("$fa={};\n", $fa).as_bytes()).unwrap();
-       file.write(format!("$fs={};\n", $fs).as_bytes()).unwrap();
-       for child in children {
-           let s = format!("{}", child);
-           file.write(s.as_bytes()).unwrap();
-       }
-       file.flush().unwrap();
+        let t = fat_thread!({
+            let children = vec![$($child,)+];
+            let mut file = std::fs::File::create($path).unwrap();
+            file.write(format!("$fa={};\n", $fa).as_bytes()).unwrap();
+            file.write(format!("$fs={};\n", $fs).as_bytes()).unwrap();
+            for child in children {
+                let s = format!("{}", child);
+                file.write(s.as_bytes()).unwrap();
+            }
+            file.flush().unwrap();
+        });
+        t.join().unwrap();
     };
     ($path:expr, fn=$fn:expr, $($child:expr);+;) => {
-       let children = vec![$($child,)+];
-       let mut file = std::fs::File::create($path).unwrap();
-       file.write(format!("$fn={};\n", $fn).as_bytes()).unwrap();
-       for child in children {
-           let s = format!("{}", child);
-           file.write(s.as_bytes()).unwrap();
-       }
-       file.flush().unwrap();
+        let t = fat_thread!({
+            let children = vec![$($child,)+];
+            let mut file = std::fs::File::create($path).unwrap();
+            file.write(format!("$fn={};\n", $fn).as_bytes()).unwrap();
+            for child in children {
+                let s = format!("{}", child);
+                file.write(s.as_bytes()).unwrap();
+            }
+            file.flush().unwrap();
+        });
+        t.join().unwrap();
     };
     ($path:expr, fs=$fs:expr, $($child:expr);+;) => {
-       let children = vec![$($child,)+];
-       let mut file = std::fs::File::create($path).unwrap();
-       file.write(format!("$fs={};\n", $fs).as_bytes()).unwrap();
-       for child in children {
-           let s = format!("{}", child);
-           file.write(s.as_bytes()).unwrap();
-       }
-       file.flush().unwrap();
+        let t = fat_thread!({
+            let children = vec![$($child,)+];
+            let mut file = std::fs::File::create($path).unwrap();
+            file.write(format!("$fs={};\n", $fs).as_bytes()).unwrap();
+            for child in children {
+                let s = format!("{}", child);
+                file.write(s.as_bytes()).unwrap();
+            }
+            file.flush().unwrap();
+        });
+        t.join().unwrap();
     };
     ($path:expr, fa=$fa:expr, $($child:expr);+;) => {
-       let children = vec![$($child,)+];
-       let mut file = std::fs::File::create($path).unwrap();
-       file.write(format!("$fa={};\n", $fa).as_bytes()).unwrap();
-       for child in children {
-           let s = format!("{}", child);
-           file.write(s.as_bytes()).unwrap();
-       }
-       file.flush().unwrap();
+        let t = fat_thread!({
+            let children = vec![$($child,)+];
+            let mut file = std::fs::File::create($path).unwrap();
+            file.write(format!("$fa={};\n", $fa).as_bytes()).unwrap();
+            for child in children {
+                let s = format!("{}", child);
+                file.write(s.as_bytes()).unwrap();
+            }
+            file.flush().unwrap();
+        });
+        t.join().unwrap();
     };
     ($path:expr, $($child:expr);+;) => {
-       let children = vec![$($child,)+];
-       let mut file = std::fs::File::create($path).unwrap();
-       for child in children {
-           let s = format!("{}", child);
-           file.write(s.as_bytes()).unwrap();
-       }
-       file.flush().unwrap();
+        let t = fat_thread!({
+            let children = vec![$($child,)+];
+            let mut file = std::fs::File::create($path).unwrap();
+            for child in children {
+                let s = format!("{}", child);
+                file.write(s.as_bytes()).unwrap();
+            }
+            file.flush().unwrap();
+        });
+        t.join().unwrap();
     };
 }
 
