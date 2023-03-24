@@ -21,7 +21,7 @@
 // SOFTWARE.
 //
 
-use crate::{dcos, dsin, Pt4};
+use crate::{dcos, dsin, Mt4, Pt4};
 
 #[derive(Clone, PartialEq)]
 pub struct Pt3s {
@@ -65,6 +65,18 @@ impl Pt3s {
 
     pub fn from_pt3s(pt2s: Vec<Pt3>) -> Self {
         Self { inner: pt2s }
+    }
+
+    pub fn translate(&mut self, point: Pt3) {
+        for pt in self.iter_mut() {
+            *pt = *pt + point
+        }
+    }
+
+    pub fn apply_matrix(&mut self, matrix: &Mt4) {
+        for pt in self.iter_mut() {
+            *pt = (*matrix * pt.as_pt4(1.0)).as_pt3()
+        }
     }
 }
 

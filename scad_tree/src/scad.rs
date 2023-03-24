@@ -431,7 +431,7 @@ impl std::fmt::Display for Scad {
                 if let Some(rgba) = rgba {
                     write!(f, "color(c={}) {{\n", rgba)?;
                 } else if let Some(color) = color {
-                    write!(f, "color({:?}", color)?;
+                    write!(f, "color(\"{:?}\"", color)?;
                     if let Some(alpha) = alpha {
                         write!(f, ", alpha={}", alpha)?;
                     }

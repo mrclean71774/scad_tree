@@ -165,6 +165,17 @@ pub fn triangulate2d(vertices: &Pt2s) -> Indices {
     triangulate(polygon)
 }
 
+pub fn triangulate2d_rev(vertices: &Pt2s) -> Indices {
+    assert!(vertices.len() > 3);
+    let mut polygon = Vec::with_capacity(vertices.len());
+    for (i, v) in vertices.iter().enumerate() {
+        polygon.push((i as u64, *v));
+    }
+    polygon.reverse();
+
+    triangulate(polygon)
+}
+
 // triangulates clockwise
 fn triangulate(mut polygon: Vec<(u64, Pt2)>) -> Indices {
     let mut triangles = Indices::from_indices(Vec::with_capacity((polygon.len() - 2) * 3));
@@ -194,7 +205,8 @@ fn triangulate(mut polygon: Vec<(u64, Pt2)>) -> Indices {
             index + 1
         }],
     ];
-    assert!(!is_ccw(&tri));
+    //assert!(!is_ccw(&tri));
+    let ccw = is_ccw(&tri);
 
     while polygon.len() >= 3 {
         let mut eartip = -1i16;
@@ -218,7 +230,7 @@ fn triangulate(mut polygon: Vec<(u64, Pt2)>) -> Indices {
             };
 
             let tri = vec![polygon[p as usize], *i, polygon[n as usize]];
-            if is_ccw(&tri) {
+            if is_ccw(&tri) != ccw {
                 continue;
             }
 

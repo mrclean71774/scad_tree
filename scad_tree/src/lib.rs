@@ -22,6 +22,8 @@
 //
 
 pub mod dim2;
+pub mod dim3;
+pub mod metric_thread;
 mod scad;
 mod triangulate;
 mod viewer;
@@ -29,11 +31,11 @@ mod viewer;
 pub mod prelude {
     pub use {
         crate::{
-            circle, color, cube, cylinder, difference, dim2, fat_thread, hull, import,
-            intersection, linear_extrude, minkowski, mirror, polygon, polyhedron, projection,
-            resize, rotate, rotate_extrude, scad_file, scale, sphere, square, surface, text,
-            translate, union, Faces, Indices, Paths, Pt2, Pt2s, Pt3, Pt3s, Pt4, Scad, ScadColor,
-            ScadOp, TextDirection, TextHalign, TextParams, TextValign,
+            circle, color, cube, cylinder, difference, dim2, dim3, fat_thread, hull, import,
+            intersection, linear_extrude, metric_thread, minkowski, mirror, polygon, polyhedron,
+            projection, resize, rotate, rotate_extrude, scad_file, scale, sphere, square, surface,
+            text, translate, union, Faces, Indices, Paths, Polyhedron, Pt2, Pt2s, Pt3, Pt3s, Pt4,
+            Scad, ScadColor, ScadOp, TextDirection, TextHalign, TextParams, TextValign, Viewer,
         },
         std::io::Write,
     };
@@ -41,12 +43,13 @@ pub mod prelude {
 
 pub use {
     dim2::{CubicBezier2D, QuadraticBezier2D},
+    dim3::Polyhedron,
     scad::{Scad, ScadColor, ScadOp, TextDirection, TextHalign, TextParams, TextValign},
     scad_tree_math::{
         approx_eq, dacos, dasin, datan, dcos, dsin, dtan, MersenneTwister, Mt4, Pt2, Pt2s, Pt3,
         Pt3s, Pt4, Pt4s,
     },
-    triangulate::{triangulate2d, triangulate3d},
+    triangulate::{triangulate2d, triangulate2d_rev, triangulate3d},
     viewer::Viewer,
 };
 
@@ -121,6 +124,12 @@ impl std::fmt::Display for Paths {
 impl Paths {
     pub fn new() -> Self {
         Self { inner: Vec::new() }
+    }
+
+    pub fn with_capacity(capacity: usize) -> Self {
+        Self {
+            inner: Vec::with_capacity(capacity),
+        }
     }
 
     pub fn from_paths(paths: Vec<Indices>) -> Self {
