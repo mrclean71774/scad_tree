@@ -73,6 +73,18 @@ pub fn rounded_rect(width: f64, height: f64, radius: f64, segments: u64, center:
     tr
 }
 
+pub fn chamfer(size: f64, oversize: f64) -> Pt2s {
+    Pt2s::from_pt2s(vec![
+        Pt2::new(0.0, size + oversize),
+        Pt2::new(oversize, size + oversize),
+        Pt2::new(oversize, size),
+        Pt2::new(size, oversize),
+        Pt2::new(size + oversize, oversize),
+        Pt2::new(oversize + size, 0.0),
+        Pt2::new(0.0, 0.0),
+    ])
+}
+
 pub fn quadratic_bezier(start: Pt2, control: Pt2, end: Pt2, segments: u64) -> Pt2s {
     let delta = 1.0 / segments as f64;
     let mut points = Pt2s::new();
