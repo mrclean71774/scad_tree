@@ -78,6 +78,27 @@ impl Pt3s {
             *pt = (*matrix * pt.as_pt4(1.0)).as_pt3()
         }
     }
+
+    pub fn rotate_x(&mut self, degrees: f64) -> &mut Self {
+        for point in self.iter_mut() {
+            point.rotate_x(degrees);
+        }
+        self
+    }
+
+    pub fn rotate_y(&mut self, degrees: f64) -> &mut Self {
+        for point in self.iter_mut() {
+            point.rotate_y(degrees);
+        }
+        self
+    }
+
+    pub fn rotate_z(&mut self, degrees: f64) -> &mut Self {
+        for point in self.iter_mut() {
+            point.rotate_z(degrees);
+        }
+        self
+    }
 }
 
 #[derive(Clone, Copy, Debug, Default, PartialEq)]

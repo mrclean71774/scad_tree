@@ -104,13 +104,13 @@ fn threaded_cylinder(
     pitch: f64,
     length: f64,
     segments: usize,
-    lead_in: bool,
     lead_in_degrees: f64,
-    lead_out: bool,
     lead_out_degrees: f64,
     left_hand_thread: bool,
     center: bool,
 ) -> Scad {
+    let lead_in = lead_in_degrees > 0.0;
+    let lead_out = lead_out_degrees > 0.0;
     let thread_length = length - 0.7 * pitch;
     let n_revolutions = thread_length / pitch;
     let n_steps = (n_revolutions * segments as f64) as usize;
@@ -406,7 +406,7 @@ fn threaded_cylinder(
     }
     let threads = polyhedron!(Pt3s::from_pt3s(vertices), faces);
 
-    let rod = dim3::cylinder(d_min / 2.0 + 0.0001, length, segments as u64);
+    let rod = Polyhedron::cylinder(d_min / 2.0 + 0.0001, length, segments as u64);
     let rod = polyhedron!(rod.points, rod.faces);
 
     let mut result = threads + rod;
@@ -442,9 +442,7 @@ pub fn threaded_rod(
     m: i32,
     length: f64,
     segments: usize,
-    lead_in: bool,
     lead_in_degrees: f64,
-    lead_out: bool,
     lead_out_degrees: f64,
     left_hand_thread: bool,
     center: bool,
@@ -460,9 +458,7 @@ pub fn threaded_rod(
         pitch,
         length,
         segments,
-        lead_in,
         lead_in_degrees,
-        lead_out,
         lead_out_degrees,
         left_hand_thread,
         center,
@@ -492,150 +488,154 @@ pub fn threaded_rod(
 /// center: Center vertically.
 ///
 /// return: The hex bolt.
-//pub fn hex_bolt(
-//    m: i32,
-//    length: f64,
-//    head_height: f64,
-//    segments: usize,
-//    lead_in: bool,
-//    lead_in_degrees: f64,
-//    chamfered: bool,
-//    chamfer_size: f64,
-//    left_hand_thread: bool,
-//    center: bool,
-//) -> Self {
-//    let thread_info = m_table_lookup(m);
-//    let pitch = thread_info["pitch"];
-//    let d_maj = thread_info["external_dMaj"];
-//    let head_diameter = thread_info["nut_width"];
-//    let d_min = d_min_from_d_maj_pitch(d_maj, pitch);
-//
-//    let mut rod = Self::threaded_cylinder(
-//        d_min,
-//        d_maj,
-//        pitch,
-//        length,
-//        segments,
-//        false,
-//        180.0,
-//        lead_in,
-//        lead_in_degrees,
-//        left_hand_thread,
-//        false,
-//    );
-//    rod.translate(Pt3::new(0.0, 0.0, head_height));
-//
-//    let mut head =
-//        Mesh::circumscribed_polygon(6, head_diameter / 2.0, head_height, false).into_scad();
-//    if chamfered {
-//        let (cut1, cut2) = Mesh::external_cylinder_chamfer(
-//            chamfer_size,
-//            1.0,
-//            (0.25 * head_diameter * 0.25 * head_diameter
-//                + 0.5 * head_diameter * 0.5 * head_diameter)
-//                .sqrt(),
-//            head_height,
-//            segments,
-//            false,
-//        );
-//        head = head - cut1.into_scad();
-//        head = head - cut2.into_scad();
-//    }
-//    let mut bolt = rod + head;
-//    if center {
-//        bolt.translate(Pt3::new(0.0, 0.0, -((head_height + length) / 2.0)));
-//    }
-//    bolt
-//}
-//
-///// Create a tap for making threaded holes in things.
-/////
-///// m: The metric size of the tap.
-/////
-///// length: The length of the tap.
-/////
-///// segments: The number of segmentst in a circle.
-/////
-///// left_hand_thread: lefty tighty?
-/////
-///// center: Center vertically.
-/////
-///// return: The tap.
-//pub fn tap(m: i32, length: f64, segments: usize, left_hand_thread: bool, center: bool) -> Self {
-//    let thread_info = m_table_lookup(m);
-//    let pitch = thread_info["pitch"];
-//    let d_maj = thread_info["internal_dMaj"];
-//    let d_min = d_min_from_d_maj_pitch(d_maj, pitch);
-//
-//    Self::threaded_cylinder(
-//        d_min,
-//        d_maj,
-//        pitch,
-//        length,
-//        segments,
-//        false,
-//        90.0,
-//        false,
-//        90.0,
-//        left_hand_thread,
-//        center,
-//    )
-//}
-//
-///// Create a hex nut.
-/////
-///// m: The metric size of the nut.
-/////
-///// height: The height of the nut.
-/////
-///// segments: The number of segments in a circle.
-/////
-///// chamfered: Adds a chamfer to the nut.
-/////
-///// chamfer_size: The size of the chamfer, leave at 0.0 for the default size.
-/////
-///// left_hand_thread: lefty tighty?
-/////
-///// center: Center horizontally.
-/////
-///// return: The nut.
-//pub fn hex_nut(
-//    m: i32,
-//    height: f64,
-//    segments: usize,
-//    chamfered: bool,
-//    chamfer_size: f64,
-//    left_hand_thread: bool,
-//    center: bool,
-//) -> Self {
-//    let thread_info = m_table_lookup(m);
-//    let nut_width = thread_info["nut_width"];
-//
-//    let mut nut_tap = Self::tap(m, height + 20.0, segments, left_hand_thread, center);
-//    nut_tap.translate(Pt3::new(0.0, 0.0, -10.0));
-//
-//    let nut_blank = Mesh::circumscribed_polygon(6, nut_width / 2.0, height, false).into_scad();
-//
-//    let mut nut = nut_blank - nut_tap;
-//    if chamfered {
-//        let (cut1, cut2) = Mesh::external_cylinder_chamfer(
-//            chamfer_size,
-//            1.0,
-//            (0.25 * nut_width * 0.25 * nut_width + 0.5 * nut_width * 0.5 * nut_width).sqrt(),
-//            height,
-//            segments,
-//            center,
-//        );
-//        nut = nut - cut1.into_scad();
-//        nut = nut - cut2.into_scad();
-//    }
-//
-//    if center {
-//        nut.translate(Pt3::new(0.0, 0.0, -height / 2.0));
-//    }
-//
-//    nut
-//}
+pub fn hex_bolt(
+    m: i32,
+    length: f64,
+    head_height: f64,
+    segments: usize,
+    lead_in_degrees: f64,
+    chamfered: bool,
+    chamfer_size: f64,
+    left_hand_thread: bool,
+    center: bool,
+) -> Scad {
+    let thread_info = m_table_lookup(m);
+    let pitch = thread_info["pitch"];
+    let d_maj = thread_info["external_dMaj"];
+    let head_diameter = thread_info["nut_width"];
+    let d_min = d_min_from_d_maj_pitch(d_maj, pitch);
+
+    let mut rod = threaded_cylinder(
+        d_min,
+        d_maj,
+        pitch,
+        length,
+        segments,
+        0.0,
+        lead_in_degrees,
+        left_hand_thread,
+        false,
+    );
+    rod = translate!([0.0, 0.0, head_height], rod;);
+
+    let head = Polyhedron::linear_extrude(
+        &dim2::circumscribed_polygon(6, head_diameter / 2.0),
+        head_height,
+    );
+    let mut head = polyhedron!(head.points, head.faces);
+    if chamfered {
+        let (cut1, cut2) = Polyhedron::external_cylinder_chamfer(
+            chamfer_size,
+            1.0,
+            (0.25 * head_diameter * 0.25 * head_diameter
+                + 0.5 * head_diameter * 0.5 * head_diameter)
+                .sqrt(),
+            head_height,
+            segments,
+            false,
+        );
+        let cut1 = polyhedron!(cut1.points, cut1.faces);
+        let cut2 = polyhedron!(cut2.points, cut2.faces);
+        head = head - cut1;
+        head = head - cut2;
+    }
+    let mut bolt = rod + head;
+    if center {
+        bolt = translate!([0.0, 0.0, -((head_height + length) / 2.0)], bolt;);
+    }
+    bolt
+}
+
+/// Create a tap for making threaded holes in things.
+///
+/// m: The metric size of the tap.
+///
+/// length: The length of the tap.
+///
+/// segments: The number of segmentst in a circle.
+///
+/// left_hand_thread: lefty tighty?
+///
+/// center: Center vertically.
+///
+/// return: The tap.
+pub fn tap(m: i32, length: f64, segments: usize, left_hand_thread: bool, center: bool) -> Scad {
+    let thread_info = m_table_lookup(m);
+    let pitch = thread_info["pitch"];
+    let d_maj = thread_info["internal_dMaj"];
+    let d_min = d_min_from_d_maj_pitch(d_maj, pitch);
+
+    threaded_cylinder(
+        d_min,
+        d_maj,
+        pitch,
+        length,
+        segments,
+        0.0,
+        0.0,
+        left_hand_thread,
+        center,
+    )
+}
+
+/// Create a hex nut.
+///
+/// m: The metric size of the nut.
+///
+/// height: The height of the nut.
+///
+/// segments: The number of segments in a circle.
+///
+/// chamfered: Adds a chamfer to the nut.
+///
+/// chamfer_size: The size of the chamfer, leave at 0.0 for the default size.
+///
+/// left_hand_thread: lefty tighty?
+///
+/// center: Center horizontally.
+///
+/// return: The nut.
+pub fn hex_nut(
+    m: i32,
+    height: f64,
+    segments: usize,
+    chamfered: bool,
+    chamfer_size: f64,
+    left_hand_thread: bool,
+    center: bool,
+) -> Scad {
+    let thread_info = m_table_lookup(m);
+    let nut_width = thread_info["nut_width"];
+
+    let mut nut_tap = tap(m, height + 20.0, segments, left_hand_thread, center);
+    nut_tap = translate!([0.0, 0.0, -10.0], nut_tap;);
+
+    let nut_blank =
+        Polyhedron::linear_extrude(&dim2::circumscribed_polygon(6, nut_width / 2.0), height);
+    let nut_blank = polyhedron!(nut_blank.points, nut_blank.faces);
+
+    let mut nut = nut_blank - nut_tap;
+    if chamfered {
+        let (cut1, cut2) = Polyhedron::external_cylinder_chamfer(
+            chamfer_size,
+            1.0,
+            (0.25 * nut_width * 0.25 * nut_width + 0.5 * nut_width * 0.5 * nut_width).sqrt(),
+            height,
+            segments,
+            center,
+        );
+        let cut1 = polyhedron!(cut1.points, cut1.faces);
+        let cut2 = polyhedron!(cut2.points, cut2.faces);
+        nut = nut - cut1;
+        nut = nut - cut2;
+    }
+
+    if center {
+        nut = translate!([0.0, 0.0, -height / 2.0], nut;);
+    }
+
+    nut
+}
 
 /// Returns the hashmap of iso metric thread profiles
 fn m_table() -> HashMap<i32, HashMap<&'static str, f64>> {

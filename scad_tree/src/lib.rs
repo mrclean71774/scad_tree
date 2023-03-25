@@ -49,7 +49,7 @@ pub use {
         approx_eq, dacos, dasin, datan, dcos, dsin, dtan, MersenneTwister, Mt4, Pt2, Pt2s, Pt3,
         Pt3s, Pt4, Pt4s,
     },
-    triangulate::{triangulate2d, triangulate2d_rev, triangulate3d},
+    triangulate::{triangulate2d, triangulate2d_rev, triangulate3d, triangulate3d_rev},
     viewer::Viewer,
 };
 

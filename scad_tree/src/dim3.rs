@@ -21,7 +21,10 @@
 // SOFTWARE.
 //
 
-use crate::{dim2, triangulate2d, triangulate2d_rev, Faces, Indices, Mt4, Pt2s, Pt3, Pt3s};
+use crate::{
+    dcos, dim2, dsin, triangulate2d, triangulate2d_rev, triangulate3d, triangulate3d_rev, Faces,
+    Indices, Mt4, Pt2, Pt2s, Pt3, Pt3s,
+};
 
 pub struct Polyhedron {
     pub points: Pt3s,
@@ -36,54 +39,213 @@ impl Polyhedron {
     pub fn apply_matrix(&mut self, matrix: &Mt4) {
         self.points.apply_matrix(matrix);
     }
-}
 
-pub fn linear_extrude(points: &Pt2s, height: f64) -> Polyhedron {
-    let indices = triangulate2d_rev(points);
-    let mut vertices = Pt3s::with_capacity(points.len() * 2);
-    for point in points.iter() {
-        vertices.push(point.as_pt3(0.0));
+    pub fn rotate_x(&mut self, degrees: f64) -> &mut Self {
+        self.points.rotate_x(degrees);
+        self
     }
 
-    let mut faces = Faces::with_capacity((points.len() - 2) * 2 + points.len() - 1);
-    for i in (0..indices.len()).step_by(3) {
-        faces.push(Indices::from_indices(vec![
-            indices[i],
-            indices[i + 1],
-            indices[i + 2],
-        ]));
+    pub fn rotate_y(&mut self, degrees: f64) -> &mut Self {
+        self.points.rotate_y(degrees);
+        self
     }
 
-    let mut end_points = points.iter().map(|p| p.as_pt3(height)).collect();
-    vertices.append(&mut end_points);
-    let indices = triangulate2d(points);
-    for i in (0..indices.len()).step_by(3) {
-        faces.push(Indices::from_indices(vec![
-            indices[i] + points.len() as u64,
-            indices[i + 1] + points.len() as u64,
-            indices[i + 2] + points.len() as u64,
-        ]));
+    pub fn rotate_z(&mut self, degrees: f64) -> &mut Self {
+        self.points.rotate_z(degrees);
+        self
     }
 
-    for i in 0..points.len() {
-        let p0 = i;
-        let p1 = (i + 1) % points.len();
-        let p2 = (i + 1) % points.len() + points.len();
-        let p3 = i + points.len();
+    pub fn linear_extrude(points: &Pt2s, height: f64) -> Polyhedron {
+        let indices = triangulate2d_rev(points);
+        let mut vertices = Pt3s::with_capacity(points.len() * 2);
+        for point in points.iter() {
+            vertices.push(point.as_pt3(0.0));
+        }
 
-        faces.push(Indices::from_indices(vec![
-            p0 as u64, p1 as u64, p2 as u64, p3 as u64,
-        ]));
+        let mut faces = Faces::with_capacity((points.len() - 2) * 2 + points.len() - 1);
+        for i in (0..indices.len()).step_by(3) {
+            faces.push(Indices::from_indices(vec![
+                indices[i],
+                indices[i + 1],
+                indices[i + 2],
+            ]));
+        }
+
+        let mut end_points = points.iter().map(|p| p.as_pt3(height)).collect();
+        vertices.append(&mut end_points);
+        let indices = triangulate2d(points);
+        for i in (0..indices.len()).step_by(3) {
+            faces.push(Indices::from_indices(vec![
+                indices[i] + points.len() as u64,
+                indices[i + 1] + points.len() as u64,
+                indices[i + 2] + points.len() as u64,
+            ]));
+        }
+
+        for i in 0..points.len() {
+            let p0 = i;
+            let p1 = (i + 1) % points.len();
+            let p2 = (i + 1) % points.len() + points.len();
+            let p3 = i + points.len();
+
+            faces.push(Indices::from_indices(vec![
+                p0 as u64, p1 as u64, p2 as u64, p3 as u64,
+            ]));
+        }
+
+        Polyhedron {
+            points: vertices,
+            faces,
+        }
     }
 
-    Polyhedron {
-        points: vertices,
-        faces,
-    }
-}
+    pub fn rotate_extrude(profile: &Pt2s, degrees: f64, segments: usize) -> Self {
+        assert!(degrees >= 0.0 && degrees <= 360.0);
+        assert!(segments >= 3);
+        let not_closed = degrees != 360.0;
+        let profile: Pt3s =
+            Pt3s::from_pt3s(profile.iter().map(|p| Pt3::new(p.x, 0.0, p.y)).collect());
+        let profile_len = profile.len();
+        let a = degrees / segments as f64;
+        let mut points = profile.clone();
+        let mut faces = Faces::new();
 
-pub fn cylinder(radius: f64, height: f64, segments: u64) -> Polyhedron {
-    linear_extrude(&dim2::circle(radius, segments), height)
+        if not_closed {
+            // triangulate the starting face
+            let triangles = triangulate3d(&profile, Pt3::new(0.0, -1.0, 0.0));
+            for i in (0..triangles.len()).step_by(3) {
+                faces.push(Indices::from_indices(vec![
+                    triangles[i] as u64,
+                    triangles[i + 1] as u64,
+                    triangles[i + 2] as u64,
+                ]));
+            }
+        }
+
+        for segment in 1..segments {
+            let s = dsin(a * segment as f64);
+            let c = dcos(a * segment as f64);
+            for p in 0..profile_len {
+                points.push(Pt3::new(profile[p].x * c, profile[p].x * s, profile[p].z));
+                let p0 = (segment - 1) * profile_len + p;
+                let p1 = (segment - 1) * profile_len + ((p + 1) % profile_len);
+                let p2 = segment * profile_len + ((p + 1) % profile_len);
+                let p3 = segment * profile_len + p;
+                faces.push(Indices::from_indices(vec![
+                    p0 as u64, p1 as u64, p2 as u64, p3 as u64,
+                ]));
+            }
+        }
+
+        if not_closed {
+            let s = dsin(a * segments as f64);
+            let c = dcos(a * segments as f64);
+            for p in 0..profile_len {
+                points.push(Pt3::new(profile[p].x * c, profile[p].x * s, profile[p].z));
+                let p0 = (segments - 1) * profile_len + p;
+                let p1 = (segments - 1) * profile_len + ((p + 1) % profile_len);
+                let p2 = segments * profile_len + ((p + 1) % profile_len);
+                let p3 = segments * profile_len + p;
+                faces.push(Indices::from_indices(vec![
+                    p0 as u64, p1 as u64, p2 as u64, p3 as u64,
+                ]));
+            }
+            let nml = Pt3::new(0.0, -1.0, 0.0).rotated_z(degrees + 180.0);
+            let triangles = triangulate3d_rev(&profile, nml);
+            for i in (0..triangles.len()).step_by(3) {
+                faces.push(Indices::from_indices(vec![
+                    triangles[i] as u64 + (segments * profile_len) as u64,
+                    triangles[i + 1] as u64 + (segments * profile_len) as u64,
+                    triangles[i + 2] as u64 + (segments * profile_len) as u64,
+                ]));
+            }
+        } else {
+            for p in 0..profile_len {
+                let p0 = (segments - 1) * profile_len + p;
+                let p1 = (segments - 1) * profile_len + ((p + 1) % profile_len);
+                let p2 = (p + 1) % profile_len;
+                let p3 = p;
+                faces.push(Indices::from_indices(vec![
+                    p0 as u64, p1 as u64, p2 as u64, p3 as u64,
+                ]));
+            }
+        }
+        Polyhedron { points, faces }
+    }
+
+    pub fn cylinder(radius: f64, height: f64, segments: u64) -> Self {
+        Self::linear_extrude(&dim2::circle(radius, segments), height)
+    }
+
+    /// Creates a linear shape that can be used to chamfer a corner.
+    ///
+    /// size: The height and width of the angled part of the chamfer.
+    ///
+    /// oversize: How much non-angled part there is on the chamfer.
+    ///
+    /// return: The mesh.
+    pub fn chamfer(size: f64, length: f64, oversize: f64) -> Self {
+        Self::linear_extrude(&dim2::chamfer(size, oversize), length)
+    }
+
+    /// Creates a curved chamfer shape.
+    ///
+    /// size: The size of the angled part of the chamfer profile.
+    ///
+    /// oversize: How much non-angled part there is on the chamfer.
+    ///
+    /// radius: The radius of the arc that the chamfer takes.
+    ///
+    /// degrees: The degrees of the arc that the chamfer is extruded through.
+    ///
+    /// segments: The number of segments in a circle.
+    ///
+    /// return: The mesh.
+    pub fn external_circle_chamfer(
+        size: f64,
+        oversize: f64,
+        radius: f64,
+        degrees: f64,
+        segments: usize,
+    ) -> Self {
+        let mut points2 = dim2::chamfer(size, oversize);
+        points2
+            .rotate(90.0)
+            .translate(Pt2::new(radius + size / 2.0 + oversize / 2.0, -oversize));
+        Self::rotate_extrude(&points2, degrees, segments)
+    }
+
+    /// Creates two external circle chamfers for chamfering a cylinder.
+    ///
+    /// size: The size of the angled part of the chamfer profile.
+    ///
+    /// oversize: How much non-angled part there is on the chamfer.
+    ///
+    /// radius: The radius of the cylinder to be chamfered.
+    ///
+    /// height: The height of the cylinder to be chamfered.
+    ///
+    /// segments: The number of segments in a circle.
+    ///
+    /// return: The mesh.
+    pub fn external_cylinder_chamfer(
+        size: f64,
+        oversize: f64,
+        radius: f64,
+        height: f64,
+        segments: usize,
+        center: bool,
+    ) -> (Self, Self) {
+        let mut result = Self::external_circle_chamfer(size, oversize, radius, 360.0, segments);
+        let mut result1 = Self::external_circle_chamfer(size, oversize, radius, 360.0, segments);
+        result1.rotate_x(180.0);
+        result1.translate(Pt3::new(0.0, 0.0, height));
+        if center {
+            result.translate(Pt3::new(0.0, 0.0, -height / 2.0));
+            result1.translate(Pt3::new(0.0, 0.0, -height / 2.0));
+        }
+        (result, result1)
+    }
 }
 
 pub fn quadratic_bezier(start: Pt3, control: Pt3, end: Pt3, segments: u64) -> Pt3s {

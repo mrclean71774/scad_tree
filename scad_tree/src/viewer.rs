@@ -89,7 +89,8 @@ impl Viewer {
         let mut children = Vec::new();
         for (start, end) in edges {
             let matrix = Mt4::look_at_matrix_rh(*start, *end, Pt3::new(0.0, 0.0, 1.0));
-            let mut c = dim3::cylinder(self.edge_radius, (*end - *start).len(), self.segments);
+            let mut c =
+                Polyhedron::cylinder(self.edge_radius, (*end - *start).len(), self.segments);
             c.apply_matrix(&matrix);
             c.translate(*end);
 

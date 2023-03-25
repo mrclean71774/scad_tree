@@ -150,6 +150,79 @@ pub fn triangulate3d(vertices: &Pt3s, normal: Pt3) -> Indices {
     triangulate(polygon)
 }
 
+pub fn triangulate3d_rev(vertices: &Pt3s, normal: Pt3) -> Indices {
+    assert!(vertices.len() > 3);
+    const PX: u8 = 1;
+    const NX: u8 = 2;
+    const PY: u8 = 3;
+    const NY: u8 = 4;
+    const PZ: u8 = 5;
+    const NZ: u8 = 6;
+    let mut nml_type = 0;
+    if normal.x.abs() >= normal.y.abs() && normal.x.abs() >= normal.z.abs() {
+        if normal.x >= 0.0 {
+            nml_type = PX;
+        } else {
+            nml_type = NX;
+        }
+    } else if normal.y.abs() >= normal.x.abs() && normal.y.abs() >= normal.z.abs() {
+        if normal.y >= 0.0 {
+            nml_type = PY;
+        } else {
+            nml_type = NY;
+        }
+    } else if normal.z.abs() >= normal.x.abs() && normal.z.abs() >= normal.y.abs() {
+        if normal.z >= 0.0 {
+            nml_type = PZ;
+        } else {
+            nml_type = NZ;
+        }
+    }
+    let mut polygon = Vec::with_capacity(vertices.len());
+    match nml_type {
+        PX => {
+            // x = y, y = z
+            for (i, v) in vertices.iter().enumerate() {
+                polygon.push((i as u64, Pt2::new(v.y, v.z)));
+            }
+        }
+        NX => {
+            // x = -y, y = z
+            for (i, v) in vertices.iter().enumerate() {
+                polygon.push((i as u64, Pt2::new(-v.y, v.z)));
+            }
+        }
+        PY => {
+            // x = -x, y = z
+            for (i, v) in vertices.iter().enumerate() {
+                polygon.push((i as u64, Pt2::new(-v.x, v.z)));
+            }
+        }
+        NY => {
+            // x = x, y = z
+            for (i, v) in vertices.iter().enumerate() {
+                polygon.push((i as u64, Pt2::new(v.x, v.z)));
+            }
+        }
+        PZ => {
+            // x = x, y = y
+            for (i, v) in vertices.iter().enumerate() {
+                polygon.push((i as u64, Pt2::new(v.x, v.y)));
+            }
+        }
+        NZ => {
+            // x = -x, y =  y
+            for (i, v) in vertices.iter().enumerate() {
+                polygon.push((i as u64, Pt2::new(-v.x, v.y)));
+            }
+        }
+        _ => {}
+    }
+    polygon.reverse();
+
+    triangulate(polygon)
+}
+
 /// Triangulate a 2D polygon
 ///
 /// vertices: The vertices of the polygon.

@@ -72,6 +72,13 @@ impl Pt2s {
             *pt = *pt + point
         }
     }
+
+    pub fn rotate(&mut self, degrees: f64) -> &mut Self {
+        for p in self.iter_mut() {
+            p.rotate(degrees);
+        }
+        self
+    }
 }
 
 #[derive(Clone, Copy, Debug, Default, PartialEq)]
