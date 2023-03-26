@@ -158,6 +158,70 @@ pub struct Scad {
 }
 
 impl Scad {
+    /// Creates a curved chamfer shape.
+    ///
+    /// size: The size of the angled part of the chamfer profile.
+    ///
+    /// oversize: How much non-angled part there is on the chamfer.
+    ///
+    /// radius: The radius of the arc that the chamfer takes.
+    ///
+    /// degrees: The degrees of the arc that the chamfer is extruded through.
+    ///
+    /// segments: The number of segments in a circle.
+    ///
+    /// return: The mesh.
+    pub fn external_circle_chamfer(
+        size: f64,
+        oversize: f64,
+        radius: f64,
+        degrees: f64,
+        segments: u64,
+    ) -> Self {
+        rotate_extrude!(angle=degrees, convexity=5, fn=segments,
+            translate!([radius + size / 2.0 + oversize / 2.0, -oversize, 0.0],
+                rotate!(90.0,
+                    polygon!(dim2::chamfer(size, oversize));
+                );
+            );
+        )
+    }
+
+    /// Creates two external circle chamfers for chamfering a cylinder.
+    ///
+    /// size: The size of the angled part of the chamfer profile.
+    ///
+    /// oversize: How much non-angled part there is on the chamfer.
+    ///
+    /// radius: The radius of the cylinder to be chamfered.
+    ///
+    /// height: The height of the cylinder to be chamfered.
+    ///
+    /// segments: The number of segments in a circle.
+    ///
+    /// return: The mesh.
+    pub fn external_cylinder_chamfer(
+        size: f64,
+        oversize: f64,
+        radius: f64,
+        height: f64,
+        segments: u64,
+        center: bool,
+    ) -> Self {
+        let mut result = union!(
+            Self::external_circle_chamfer(size, oversize, radius, 360.0, segments);
+            translate!([0.0, 0.0, height],
+                rotate!([180.0, 0.0, 0.0],
+                    Self::external_circle_chamfer(size, oversize, radius, 360.0, segments);
+                );
+            );
+        );
+        if center {
+            result = translate!([0.0, 0.0, -height/2.0], result;);
+        }
+        result
+    }
+
     pub fn save(&self, path: &str) {
         let s = format!("{}", self);
         let mut file = std::fs::File::create(path).unwrap();

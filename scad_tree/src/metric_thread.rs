@@ -103,7 +103,7 @@ fn threaded_cylinder(
     d_maj: f64,
     pitch: f64,
     length: f64,
-    segments: usize,
+    segments: u64,
     lead_in_degrees: f64,
     lead_out_degrees: f64,
     left_hand_thread: bool,
@@ -441,7 +441,7 @@ fn threaded_cylinder(
 pub fn threaded_rod(
     m: i32,
     length: f64,
-    segments: usize,
+    segments: u64,
     lead_in_degrees: f64,
     lead_out_degrees: f64,
     left_hand_thread: bool,
@@ -492,7 +492,7 @@ pub fn hex_bolt(
     m: i32,
     length: f64,
     head_height: f64,
-    segments: usize,
+    segments: u64,
     lead_in_degrees: f64,
     chamfered: bool,
     chamfer_size: f64,
@@ -524,18 +524,17 @@ pub fn hex_bolt(
     )
     .into_scad();
     if chamfered {
-        let (cut1, cut2) = Polyhedron::external_cylinder_chamfer(
-            chamfer_size,
-            1.0,
-            (0.25 * head_diameter * 0.25 * head_diameter
-                + 0.5 * head_diameter * 0.5 * head_diameter)
-                .sqrt(),
-            head_height,
-            segments,
-            false,
-        );
-        head = head - cut1.into_scad();
-        head = head - cut2.into_scad();
+        head = head
+            - Scad::external_cylinder_chamfer(
+                chamfer_size,
+                1.0,
+                (0.25 * head_diameter * 0.25 * head_diameter
+                    + 0.5 * head_diameter * 0.5 * head_diameter)
+                    .sqrt(),
+                head_height,
+                segments,
+                center,
+            );
     }
     let mut bolt = rod + head;
     if center {
@@ -557,7 +556,7 @@ pub fn hex_bolt(
 /// center: Center vertically.
 ///
 /// return: The tap.
-pub fn tap(m: i32, length: f64, segments: usize, left_hand_thread: bool, center: bool) -> Scad {
+pub fn tap(m: i32, length: f64, segments: u64, left_hand_thread: bool, center: bool) -> Scad {
     let thread_info = m_table_lookup(m);
     let pitch = thread_info["pitch"];
     let d_maj = thread_info["internal_dMaj"];
@@ -596,7 +595,7 @@ pub fn tap(m: i32, length: f64, segments: usize, left_hand_thread: bool, center:
 pub fn hex_nut(
     m: i32,
     height: f64,
-    segments: usize,
+    segments: u64,
     chamfered: bool,
     chamfer_size: f64,
     left_hand_thread: bool,
@@ -614,16 +613,15 @@ pub fn hex_nut(
 
     let mut nut = nut_blank - nut_tap;
     if chamfered {
-        let (cut1, cut2) = Polyhedron::external_cylinder_chamfer(
-            chamfer_size,
-            1.0,
-            (0.25 * nut_width * 0.25 * nut_width + 0.5 * nut_width * 0.5 * nut_width).sqrt(),
-            height,
-            segments,
-            center,
-        );
-        nut = nut - cut1.into_scad();
-        nut = nut - cut2.into_scad();
+        nut = nut
+            - Scad::external_cylinder_chamfer(
+                chamfer_size,
+                1.0,
+                (0.25 * nut_width * 0.25 * nut_width + 0.5 * nut_width * 0.5 * nut_width).sqrt(),
+                height,
+                segments,
+                center,
+            );
     }
 
     if center {
