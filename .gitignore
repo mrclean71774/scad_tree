@@ -2,3 +2,4 @@ target/
 *.scad
 Cargo.lock
 .vscode/
+scad_tree/examples/main.rs
