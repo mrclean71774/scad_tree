@@ -404,10 +404,10 @@ fn threaded_cylinder(
             indices[i + 2] as u64,
         ]));
     }
-    let threads = polyhedron!(Pt3s::from_pt3s(vertices), faces);
+    let convexity = (length / pitch) as u64 + 1;
+    let threads = polyhedron!(Pt3s::from_pt3s(vertices), faces, convexity);
 
-    let rod = Polyhedron::cylinder(d_min / 2.0 + 0.0001, length, segments as u64);
-    let rod = polyhedron!(rod.points, rod.faces);
+    let rod = Polyhedron::cylinder(d_min / 2.0 + 0.0001, length, segments as u64).into_scad();
 
     let mut result = threads + rod;
 
@@ -518,11 +518,11 @@ pub fn hex_bolt(
     );
     rod = translate!([0.0, 0.0, head_height], rod;);
 
-    let head = Polyhedron::linear_extrude(
+    let mut head = Polyhedron::linear_extrude(
         &dim2::circumscribed_polygon(6, head_diameter / 2.0),
         head_height,
-    );
-    let mut head = polyhedron!(head.points, head.faces);
+    )
+    .into_scad();
     if chamfered {
         let (cut1, cut2) = Polyhedron::external_cylinder_chamfer(
             chamfer_size,
@@ -534,10 +534,8 @@ pub fn hex_bolt(
             segments,
             false,
         );
-        let cut1 = polyhedron!(cut1.points, cut1.faces);
-        let cut2 = polyhedron!(cut2.points, cut2.faces);
-        head = head - cut1;
-        head = head - cut2;
+        head = head - cut1.into_scad();
+        head = head - cut2.into_scad();
     }
     let mut bolt = rod + head;
     if center {
@@ -611,8 +609,8 @@ pub fn hex_nut(
     nut_tap = translate!([0.0, 0.0, -10.0], nut_tap;);
 
     let nut_blank =
-        Polyhedron::linear_extrude(&dim2::circumscribed_polygon(6, nut_width / 2.0), height);
-    let nut_blank = polyhedron!(nut_blank.points, nut_blank.faces);
+        Polyhedron::linear_extrude(&dim2::circumscribed_polygon(6, nut_width / 2.0), height)
+            .into_scad();
 
     let mut nut = nut_blank - nut_tap;
     if chamfered {
@@ -624,10 +622,8 @@ pub fn hex_nut(
             segments,
             center,
         );
-        let cut1 = polyhedron!(cut1.points, cut1.faces);
-        let cut2 = polyhedron!(cut2.points, cut2.faces);
-        nut = nut - cut1;
-        nut = nut - cut2;
+        nut = nut - cut1.into_scad();
+        nut = nut - cut2.into_scad();
     }
 
     if center {
