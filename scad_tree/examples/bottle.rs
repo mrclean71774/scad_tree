@@ -30,8 +30,7 @@ fn main() {
 }
 
 fn make_cap() {
-    let cylinder = Polyhedron::cylinder(23.0, 12.0, 128);
-    let cylinder = polyhedron!(cylinder.points, cylinder.faces);
+    let cylinder = Polyhedron::cylinder(23.0, 12.0, 128).into_scad();
     let mut tap = metric_thread::tap(40, 14.0, 128, false, false);
     tap = translate!([0.0, 0.0, 2.0], tap;);
 

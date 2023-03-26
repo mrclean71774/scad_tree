@@ -22,8 +22,8 @@
 //
 
 use crate::{
-    dcos, dim2, dsin, triangulate2d, triangulate2d_rev, triangulate3d, triangulate3d_rev, Faces,
-    Indices, Mt4, Pt2, Pt2s, Pt3, Pt3s,
+    dcos, dim2, dsin, polyhedron, triangulate2d, triangulate2d_rev, triangulate3d,
+    triangulate3d_rev, Faces, Indices, Mt4, Pt2, Pt2s, Pt3, Pt3s, Scad, ScadOp,
 };
 
 pub struct Polyhedron {
@@ -32,6 +32,9 @@ pub struct Polyhedron {
 }
 
 impl Polyhedron {
+    pub fn into_scad(self) -> Scad {
+        polyhedron!(self.points, self.faces)
+    }
     pub fn translate(&mut self, point: Pt3) {
         self.points.translate(point);
     }
