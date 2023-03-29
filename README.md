@@ -21,8 +21,8 @@ cargo run --example example_name
 
 * scad_tree - The main crate with examples of usage.
 * scad_tree_math - Linear algebra and other math mostly re-exported from scad_tree.
-* images - Images of things made with this library.
-* output - Output from the examples.
+* images - Images of things made with this library and images of some examples.
+* output - Output from some of the examples.
 
 ---
 

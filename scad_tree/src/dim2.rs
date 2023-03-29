@@ -137,7 +137,7 @@ pub fn bezier_star(
     let mut controls = Vec::new();
     let mut knots = Vec::new();
 
-    let angle = 360.0 / n_points as f64;
+    let angle = -360.0 / n_points as f64;
     for i in 0..n_points {
         knots.push(Pt2::new(
             dcos(angle * i as f64) * outer_radius,
@@ -307,5 +307,74 @@ impl CubicBezierChain2D {
             pts.pop();
         }
         pts
+    }
+}
+
+pub struct BezierStar {
+    pub chain: CubicBezierChain2D,
+}
+
+impl BezierStar {
+    pub fn new(
+        n_points: u64,
+        inner_radius: f64,
+        inner_handle_length: f64,
+        outer_radius: f64,
+        outer_handle_length: f64,
+        segments: u64,
+    ) -> Self {
+        let mut controls = Vec::new();
+        let mut knots = Vec::new();
+
+        let angle = -360.0 / n_points as f64;
+        for i in 0..n_points {
+            knots.push(Pt2::new(
+                dcos(angle * i as f64) * outer_radius,
+                dsin(angle * i as f64) * outer_radius,
+            ));
+            knots.push(Pt2::new(
+                dcos(angle * (i as f64 + 0.5)) * inner_radius,
+                dsin(angle * (i as f64 + 0.5)) * inner_radius,
+            ));
+        }
+        let n_knots = knots.len();
+        for i in 0..n_knots {
+            controls.push(
+                knots[(i + 1) % n_knots]
+                    - (knots[(i + 2) % n_knots] - knots[i]).normalized()
+                        * if i % 2 == 0 {
+                            inner_handle_length
+                        } else {
+                            outer_handle_length
+                        },
+            );
+        }
+
+        let mut chain =
+            CubicBezierChain2D::new(knots[0], controls[0], controls[0], knots[1], segments);
+        for i in 1..(n_knots - 1) {
+            chain.add(
+                if i % 2 == 0 {
+                    outer_handle_length
+                } else {
+                    inner_handle_length
+                },
+                controls[i],
+                knots[i + 1],
+                segments,
+            );
+        }
+        chain.close(
+            inner_handle_length,
+            controls[n_knots - 1],
+            outer_handle_length,
+            segments,
+        );
+
+        Self { chain }
+    }
+
+    pub fn gen_points(&self) -> Pt2s {
+        self.chain.gen_points()
     }
 }

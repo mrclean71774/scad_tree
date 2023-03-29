@@ -129,7 +129,7 @@ impl Viewer {
         }
     }
 
-    pub fn add_edges2d(&mut self, edges: &Vec<(Pt2, Pt2)>, color: ScadColor) {
+    pub fn add_lines2d(&mut self, edges: &Vec<(Pt2, Pt2)>, color: ScadColor) {
         let mut children = Vec::new();
         for (start, end) in edges {
             let matrix =
@@ -163,7 +163,7 @@ impl Viewer {
         }
     }
 
-    pub fn add_edges3d(&mut self, edges: &Vec<(Pt3, Pt3)>, color: ScadColor) {
+    pub fn add_lines3d(&mut self, edges: &Vec<(Pt3, Pt3)>, color: ScadColor) {
         let mut children = Vec::new();
         for (start, end) in edges {
             let matrix = Mt4::look_at_matrix_lh(*start, *end, Pt3::new(0.0, 0.0, 1.0));
@@ -206,8 +206,8 @@ impl Viewer {
             edges.push((points[i], points[i + 1]));
         }
 
-        self.add_edges2d(&edges, ScadColor::White);
-        self.add_edges2d(
+        self.add_lines2d(&edges, ScadColor::White);
+        self.add_lines2d(
             &vec![(curve.start, curve.control1), (curve.end, curve.control2)],
             ScadColor::Green,
         );
@@ -225,8 +225,8 @@ impl Viewer {
             edges.push((points[i], points[i + 1]));
         }
 
-        self.add_edges3d(&edges, ScadColor::White);
-        self.add_edges3d(
+        self.add_lines3d(&edges, ScadColor::White);
+        self.add_lines3d(
             &vec![(curve.start, curve.control1), (curve.end, curve.control2)],
             ScadColor::Green,
         );
@@ -238,6 +238,10 @@ impl Viewer {
         for c in &curve.curves {
             self.add_cubic_bezier2d(c);
         }
+    }
+
+    pub fn add_bezier_star(&mut self, star: &BezierStar) {
+        self.add_cubic_bezier_chain2d(&star.chain);
     }
 
     pub fn into_scad(self) -> Scad {
