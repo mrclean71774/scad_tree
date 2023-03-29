@@ -23,7 +23,7 @@
 
 use crate::{
     dcos, dim2, dsin, polyhedron, triangulate2d, triangulate2d_rev, triangulate3d,
-    triangulate3d_rev, Faces, Indices, Mt4, Pt2, Pt2s, Pt3, Pt3s, Scad, ScadOp,
+    triangulate3d_rev, Faces, Indices, Mt4, Pt2s, Pt3, Pt3s, Scad, ScadOp,
 };
 
 pub struct Polyhedron {
@@ -176,78 +176,106 @@ impl Polyhedron {
         Polyhedron { points, faces }
     }
 
+    pub fn sweep(profile: Pt2s, path: Pt3s, twist_degrees: f64, closed: bool) -> Self {
+        let profile = Pt3s::from_pt3s(profile.iter().map(|p| p.as_pt3(0.0)).collect());
+        let profile_len = profile.len();
+        let path_len = path.len();
+        let mut points = Pt3s::new();
+        let mut faces = Faces::new();
+        let twist_angle = if closed {
+            twist_degrees / path.len() as f64
+        } else {
+            twist_degrees / (path.len() - 1) as f64
+        };
+
+        let m = if closed {
+            Mt4::look_at_matrix_lh(path[path.len() - 1], path[1], Pt3::new(0.0, 0.0, 1.0))
+        } else {
+            Mt4::look_at_matrix_lh(path[0], path[1], Pt3::new(0.0, 0.0, 1.0))
+        };
+        for p in profile.iter() {
+            points.push((m * p.as_pt4(1.0)).as_pt3() + path[0]);
+        }
+        if !closed {
+            let indices = triangulate3d_rev(&profile, path[1] - path[0]);
+            for i in (0..indices.len()).step_by(3) {
+                faces.push(Indices::from_indices(vec![
+                    indices[i],
+                    indices[i + 1],
+                    indices[i + 2],
+                ]));
+            }
+        }
+
+        for path_index in 1..path_len - 1 {
+            let m = Mt4::look_at_matrix_lh(
+                path[path_index - 1],
+                path[path_index + 1],
+                Pt3::new(0.0, 0.0, 1.0),
+            );
+            for profile_index in 0..profile_len {
+                let point = profile[profile_index].rotated_z(twist_angle * path_index as f64);
+                points.push((m * point.as_pt4(0.0)).as_pt3() + path[path_index]);
+                let p0 = (path_index - 1) * profile_len + profile_index;
+                let p1 = (path_index - 1) * profile_len + ((profile_index + 1) % profile_len);
+                let p2 = path_index * profile_len + ((profile_index + 1) % profile_len);
+                let p3 = path_index * profile_len + profile_index;
+                faces.push(Indices::from_indices(vec![
+                    p0 as u64, p1 as u64, p2 as u64, p3 as u64,
+                ]));
+            }
+        }
+
+        let m = if closed {
+            Mt4::look_at_matrix_lh(path[path_len - 2], path[0], Pt3::new(0.0, 0.0, 1.0))
+        } else {
+            Mt4::look_at_matrix_lh(
+                path[path_len - 2],
+                path[path_len - 1],
+                Pt3::new(0.0, 0.0, 1.0),
+            )
+        };
+        let mut last_points = Pt3s::with_capacity(profile_len);
+        for profile_index in 0..profile_len {
+            let point = profile[profile_index].rotated_z(twist_angle * (path_len - 1) as f64);
+            let p = (m * point.as_pt4(0.0)).as_pt3() + path[path_len - 1];
+            points.push(p);
+            last_points.push(p);
+            let p0 = (path_len - 2) * profile_len + profile_index;
+            let p1 = (path_len - 2) * profile_len + ((profile_index + 1) % profile_len);
+            let p2 = (path_len - 1) * profile_len + ((profile_index + 1) % profile_len);
+            let p3 = (path_len - 1) * profile_len + profile_index;
+            faces.push(Indices::from_indices(vec![
+                p0 as u64, p1 as u64, p2 as u64, p3 as u64,
+            ]));
+        }
+
+        if !closed {
+            let indices = triangulate3d(&last_points, path[path_len - 1] - path[path_len - 2]);
+            for i in (0..indices.len()).step_by(3) {
+                faces.push(Indices::from_indices(vec![
+                    indices[i] + points.len() as u64 - profile_len as u64,
+                    indices[i + 1] + points.len() as u64 - profile_len as u64,
+                    indices[i + 2] + points.len() as u64 - profile_len as u64,
+                ]));
+            }
+        } else {
+            for profile_index in 0..profile_len {
+                let p0 = (path_len - 1) * profile_len + profile_index;
+                let p1 = (path_len - 1) * profile_len + ((profile_index + 1) % profile_len);
+                let p2 = (profile_index + 1) % profile_len;
+                let p3 = profile_index;
+                faces.push(Indices::from_indices(vec![
+                    p0 as u64, p1 as u64, p2 as u64, p3 as u64,
+                ]));
+            }
+        }
+
+        Self { points, faces }
+    }
+
     pub fn cylinder(radius: f64, height: f64, segments: u64) -> Self {
         Self::linear_extrude(&dim2::circle(radius, segments), height)
-    }
-
-    /// Creates a linear shape that can be used to chamfer a corner.
-    ///
-    /// size: The height and width of the angled part of the chamfer.
-    ///
-    /// oversize: How much non-angled part there is on the chamfer.
-    ///
-    /// return: The mesh.
-    pub fn chamfer(size: f64, length: f64, oversize: f64) -> Self {
-        Self::linear_extrude(&dim2::chamfer(size, oversize), length)
-    }
-
-    /// Creates a curved chamfer shape.
-    ///
-    /// size: The size of the angled part of the chamfer profile.
-    ///
-    /// oversize: How much non-angled part there is on the chamfer.
-    ///
-    /// radius: The radius of the arc that the chamfer takes.
-    ///
-    /// degrees: The degrees of the arc that the chamfer is extruded through.
-    ///
-    /// segments: The number of segments in a circle.
-    ///
-    /// return: The mesh.
-    pub fn external_circle_chamfer(
-        size: f64,
-        oversize: f64,
-        radius: f64,
-        degrees: f64,
-        segments: usize,
-    ) -> Self {
-        let mut points2 = dim2::chamfer(size, oversize);
-        points2
-            .rotate(90.0)
-            .translate(Pt2::new(radius + size / 2.0 + oversize / 2.0, -oversize));
-        Self::rotate_extrude(&points2, degrees, segments)
-    }
-
-    /// Creates two external circle chamfers for chamfering a cylinder.
-    ///
-    /// size: The size of the angled part of the chamfer profile.
-    ///
-    /// oversize: How much non-angled part there is on the chamfer.
-    ///
-    /// radius: The radius of the cylinder to be chamfered.
-    ///
-    /// height: The height of the cylinder to be chamfered.
-    ///
-    /// segments: The number of segments in a circle.
-    ///
-    /// return: The mesh.
-    pub fn external_cylinder_chamfer(
-        size: f64,
-        oversize: f64,
-        radius: f64,
-        height: f64,
-        segments: usize,
-        center: bool,
-    ) -> (Self, Self) {
-        let mut result = Self::external_circle_chamfer(size, oversize, radius, 360.0, segments);
-        let mut result1 = Self::external_circle_chamfer(size, oversize, radius, 360.0, segments);
-        result1.rotate_x(180.0);
-        result1.translate(Pt3::new(0.0, 0.0, height));
-        if center {
-            result.translate(Pt3::new(0.0, 0.0, -height / 2.0));
-            result1.translate(Pt3::new(0.0, 0.0, -height / 2.0));
-        }
-        (result, result1)
     }
 }
 
