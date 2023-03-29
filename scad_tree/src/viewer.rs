@@ -196,6 +196,42 @@ impl Viewer {
         }
     }
 
+    pub fn add_quadratic_bezier2d(&mut self, curve: &QuadraticBezier2D) {
+        let points = curve.gen_points();
+        self.add_pt2s(&points, ScadColor::DarkSlateGray);
+
+        let edge_count = points.len() - 1;
+        let mut edges = Vec::with_capacity(edge_count + 2); // 2 extra for handles
+        for i in 0..points.len() - 1 {
+            edges.push((points[i], points[i + 1]));
+        }
+
+        self.add_lines2d(&edges, ScadColor::White);
+        self.add_lines2d(
+            &vec![(curve.start, curve.control), (curve.end, curve.control)],
+            ScadColor::Green,
+        );
+        self.add_pt2(curve.control, ScadColor::Green);
+    }
+
+    pub fn add_quadratic_bezier3d(&mut self, curve: &QuadraticBezier3D) {
+        let points = curve.gen_points();
+        self.add_pt3s(&points, ScadColor::DarkSlateGray);
+
+        let edge_count = points.len() - 1;
+        let mut edges = Vec::with_capacity(edge_count + 2); // 2 extra for handles
+        for i in 0..points.len() - 1 {
+            edges.push((points[i], points[i + 1]));
+        }
+
+        self.add_lines3d(&edges, ScadColor::White);
+        self.add_lines3d(
+            &vec![(curve.start, curve.control), (curve.end, curve.control)],
+            ScadColor::Green,
+        );
+        self.add_pt3(curve.control, ScadColor::Green);
+    }
+
     pub fn add_cubic_bezier2d(&mut self, curve: &CubicBezier2D) {
         let points = curve.gen_points();
         self.add_pt2s(&points, ScadColor::DarkSlateGray);
