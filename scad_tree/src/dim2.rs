@@ -310,6 +310,7 @@ impl CubicBezierChain2D {
     }
 }
 
+#[derive(Clone)]
 pub struct BezierStar {
     pub chain: CubicBezierChain2D,
 }
