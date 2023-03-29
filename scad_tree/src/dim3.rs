@@ -35,6 +35,11 @@ impl Polyhedron {
     pub fn into_scad(self) -> Scad {
         polyhedron!(self.points, self.faces)
     }
+
+    pub fn into_scad_with_convexity(self, convexity: u64) -> Scad {
+        polyhedron!(self.points, self.faces, convexity)
+    }
+
     pub fn translate(&mut self, point: Pt3) {
         self.points.translate(point);
     }
@@ -176,7 +181,7 @@ impl Polyhedron {
         Polyhedron { points, faces }
     }
 
-    pub fn sweep(profile: Pt2s, path: Pt3s, twist_degrees: f64, closed: bool) -> Self {
+    pub fn sweep(profile: &Pt2s, path: &Pt3s, twist_degrees: f64, closed: bool) -> Self {
         let profile = Pt3s::from_pt3s(profile.iter().map(|p| p.as_pt3(0.0)).collect());
         let profile_len = profile.len();
         let path_len = path.len();
