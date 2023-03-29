@@ -234,6 +234,12 @@ impl Viewer {
         self.add_pt3(curve.control2, ScadColor::Green);
     }
 
+    pub fn add_cubic_bezier_chain2d(&mut self, curve: &CubicBezierChain2D) {
+        for c in &curve.curves {
+            self.add_cubic_bezier2d(c);
+        }
+    }
+
     pub fn into_scad(self) -> Scad {
         self.scad.unwrap()
     }
