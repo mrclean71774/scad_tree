@@ -28,3 +28,6 @@ cargo run --example example_name
 
 A [Blender](blender.org) render of metric thread parts.
 ![metric_thread.png](https://github.com/mrclean71774/scad_tree/blob/main/images/metric_thread.png)
+
+A photo of my bottle example 3D printed.
+![bottle_make.jpg](https://github.com/mrclean71774/scad_tree/blob/main/images/bottle_make.jpg)
