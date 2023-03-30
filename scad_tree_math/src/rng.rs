@@ -22,7 +22,7 @@
 //
 
 //! Random number generation via Mersenne Twister algorithm.
-//! A port of https://github.com/ESultanik/mtwister
+//! A port of <https://github.com/ESultanik/mtwister>
 
 const STATE_VECTOR_LENGTH: usize = 624;
 const STATE_VECTOR_M: usize = 397; // changes to STATE_VECTOR_LENGTH also require changes to this
@@ -32,6 +32,7 @@ const LOWER_MASK: u32 = 0x7fffffff;
 const TEMPERING_MASK_B: u32 = 0x9d2c5680;
 const TEMPERING_MASK_C: u32 = 0xefc60000;
 
+/// Holds the data for the Mersenne Twister algorithm.
 #[derive(Clone)]
 pub struct MersenneTwister {
     buffer: Vec<u32>,
@@ -72,10 +73,12 @@ impl MersenneTwister {
         y
     }
 
-    pub fn raw(&mut self) -> u32 {
+    /// Yeilds a random u32.
+    pub fn u32(&mut self) -> u32 {
         self.next()
     }
 
+    /// Yeilds a random f32 in the range [0..1).
     pub fn f32_0_1(&mut self) -> f32 {
         let mut u = self.next();
         if u == u32::MAX {
@@ -84,24 +87,29 @@ impl MersenneTwister {
         u as f32 / 0xffffffffu32 as f32
     }
 
+    /// Yeilds a random i32 in the range [min..max).
     pub fn i32_minmax(&mut self, min: i32, max: i32) -> i32 {
         min + ((max - min) as f32 * self.f32_0_1()) as i32
     }
 
+    /// Yeilds a random f32 in the range [min..max).
     pub fn f32_minmax(&mut self, min: f32, max: f32) -> f32 {
         min + (max - min) * self.f32_0_1() as f32
     }
 
+    /// Yeilds a random f64 in the range [min..max).
     pub fn f64_minmax(&mut self, min: f64, max: f64) -> f64 {
         min + (max - min) * self.f32_0_1() as f64
     }
 
+    /// Create a MersenneTwister seeded by the system clock.
     pub fn new() -> Self {
         let t = std::time::SystemTime::now();
         let ptr = &t as *const std::time::SystemTime as *const usize;
         Self::with_seed(unsafe { (*ptr & 0xffffffff) as u32 })
     }
 
+    /// Create a MersenneTwister with the given seed.
     pub fn with_seed(seed: u32) -> Self {
         let mut result = MersenneTwister {
             buffer: Vec::with_capacity(STATE_VECTOR_LENGTH),

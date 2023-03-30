@@ -23,6 +23,7 @@
 
 use crate::{dcos, dsin, Pt2, Pt2s};
 
+/// Create a clockwise circle or part of a circle.
 pub fn arc(start: Pt2, degrees: f64, segments: u64) -> Pt2s {
     assert!(degrees <= 360.0);
     let n_pts = if degrees == 360.0 {
@@ -38,21 +39,27 @@ pub fn arc(start: Pt2, degrees: f64, segments: u64) -> Pt2s {
     pts
 }
 
+/// Convenience function for circle creation.
 pub fn circle(radius: f64, segments: u64) -> Pt2s {
     arc(Pt2::new(radius, 0.0), 360.0, segments)
 }
 
+/// Create an inscribed polygon.
+///
 /// radius: the radius of the circle surrounding the polygon
 pub fn inscribed_polygon(n_sides: u64, radius: f64) -> Pt2s {
     circle(radius, n_sides)
 }
 
+/// Create a circumscribed polygon.
+///
 /// radius: the radius of the circle inside the polygon
 pub fn circumscribed_polygon(n_sides: u64, radius: f64) -> Pt2s {
     let radius = radius / dcos(180.0 / n_sides as f64);
     inscribed_polygon(n_sides, radius)
 }
 
+/// Create a rectangle or square with rounded corners.
 pub fn rounded_rect(width: f64, height: f64, radius: f64, segments: u64, center: bool) -> Pt2s {
     let mut tr = arc(Pt2::new(0.0, radius), 90.0, segments);
     tr.translate(Pt2::new(width - radius, height - radius));
@@ -73,6 +80,7 @@ pub fn rounded_rect(width: f64, height: f64, radius: f64, segments: u64, center:
     tr
 }
 
+/// Creates a profile for chamfering edges.
 pub fn chamfer(size: f64, oversize: f64) -> Pt2s {
     Pt2s::from_pt2s(vec![
         Pt2::new(0.0, size + oversize),
@@ -85,6 +93,9 @@ pub fn chamfer(size: f64, oversize: f64) -> Pt2s {
     ])
 }
 
+/// Yeilds the points of a quadratic bezier.
+///
+/// If you want to use a Viewer use QuadraticBezier2D struct instead.
 pub fn quadratic_bezier(start: Pt2, control: Pt2, end: Pt2, segments: u64) -> Pt2s {
     let delta = 1.0 / segments as f64;
     let mut points = Pt2s::new();
@@ -95,6 +106,9 @@ pub fn quadratic_bezier(start: Pt2, control: Pt2, end: Pt2, segments: u64) -> Pt
     points
 }
 
+/// Yeilds the points of a cubic bezier.
+///
+/// If you want to use a Viewer use CubicBezier2D struct instead.
 pub fn cubic_bezier(start: Pt2, control1: Pt2, control2: Pt2, end: Pt2, segments: u64) -> Pt2s {
     let delta = 1.0 / segments as f64;
     let mut points = Pt2s::new();
@@ -110,6 +124,7 @@ pub fn cubic_bezier(start: Pt2, control1: Pt2, control2: Pt2, end: Pt2, segments
     points
 }
 
+/// Create a star profile.
 pub fn star(n_points: usize, inner_radius: f64, outer_radius: f64) -> Pt2s {
     let angle = -360.0 / n_points as f64;
     let mut points = Pt2s::new();
@@ -126,6 +141,7 @@ pub fn star(n_points: usize, inner_radius: f64, outer_radius: f64) -> Pt2s {
     points
 }
 
+/// Create a star profile with rounded corners.
 pub fn bezier_star(
     n_points: u64,
     inner_radius: f64,
@@ -184,6 +200,7 @@ pub fn bezier_star(
     chain.gen_points()
 }
 
+/// A 2D quadratic bezier curve.
 #[derive(Clone, Copy)]
 pub struct QuadraticBezier2D {
     pub start: Pt2,
@@ -193,6 +210,7 @@ pub struct QuadraticBezier2D {
 }
 
 impl QuadraticBezier2D {
+    /// Create a new QuadraticBezier2D.
     pub fn new(start: Pt2, control: Pt2, end: Pt2, segments: u64) -> Self {
         Self {
             start,
@@ -202,11 +220,13 @@ impl QuadraticBezier2D {
         }
     }
 
+    /// Yeilds the points of the curve.
     pub fn gen_points(&self) -> Pt2s {
         quadratic_bezier(self.start, self.control, self.end, self.segments)
     }
 }
 
+/// A 2D cubic bezier curve.
 #[derive(Clone, Copy)]
 pub struct CubicBezier2D {
     pub start: Pt2,
@@ -217,6 +237,7 @@ pub struct CubicBezier2D {
 }
 
 impl CubicBezier2D {
+    /// Create a new curve.
     pub fn new(start: Pt2, control1: Pt2, control2: Pt2, end: Pt2, segments: u64) -> Self {
         Self {
             start,
@@ -227,6 +248,7 @@ impl CubicBezier2D {
         }
     }
 
+    /// Yeilds the points of the curve.
     pub fn gen_points(&self) -> Pt2s {
         cubic_bezier(
             self.start,
@@ -238,6 +260,7 @@ impl CubicBezier2D {
     }
 }
 
+/// Multiple cubic bezier curves linked together.
 #[derive(Clone)]
 pub struct CubicBezierChain2D {
     pub curves: Vec<CubicBezier2D>,
@@ -245,6 +268,7 @@ pub struct CubicBezierChain2D {
 }
 
 impl CubicBezierChain2D {
+    /// Create the start of the chain.
     pub fn new(start: Pt2, control1: Pt2, control2: Pt2, end: Pt2, segments: u64) -> Self {
         Self {
             curves: vec![CubicBezier2D {
@@ -258,6 +282,7 @@ impl CubicBezierChain2D {
         }
     }
 
+    /// Add an additional curve to the chain.
     pub fn add(
         &mut self,
         control1_length: f64,
@@ -277,6 +302,7 @@ impl CubicBezierChain2D {
         self
     }
 
+    /// Connect the ends of the chain to form a closed profile.
     pub fn close(
         &mut self,
         control1_length: f64,
@@ -291,6 +317,7 @@ impl CubicBezierChain2D {
             chain_end.end + (chain_end.end - chain_end.control2).normalized() * start_control1_len;
     }
 
+    /// Yeilds the points of the curve.
     pub fn gen_points(&self) -> Pt2s {
         let mut pts = Pt2s::from_pt2s(vec![Pt2::new(0.0, 0.0)]);
         for i in 0..self.curves.len() {
@@ -310,12 +337,14 @@ impl CubicBezierChain2D {
     }
 }
 
+/// A 2D star with rounded corners.
 #[derive(Clone)]
 pub struct BezierStar {
     pub chain: CubicBezierChain2D,
 }
 
 impl BezierStar {
+    /// Create a new BezierStar.
     pub fn new(
         n_points: u64,
         inner_radius: f64,
@@ -375,6 +404,7 @@ impl BezierStar {
         Self { chain }
     }
 
+    /// Yields the points of the bezier star.
     pub fn gen_points(&self) -> Pt2s {
         self.chain.gen_points()
     }

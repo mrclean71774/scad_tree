@@ -21,7 +21,7 @@
 // SOFTWARE.
 
 //! A Rust implementation of the ear clipping algorithm described, and coded in C++, at
-//! https://abitwise.blogspot.com/2013/09/triangulating-concave-and-convex.html
+//! <https://abitwise.blogspot.com/2013/09/triangulating-concave-and-convex.html>
 
 use crate::{approx_eq, Indices, Pt2, Pt2s, Pt3, Pt3s};
 
@@ -150,6 +150,13 @@ pub fn triangulate3d(vertices: &Pt3s, normal: Pt3) -> Indices {
     triangulate(polygon)
 }
 
+/// Triangulate a 3D polygon with vertices in CCW order.
+///
+/// vertices: The vertices of the polygon.
+///
+/// normal: The normal of the polygon.
+///
+/// return: An array of indices into the given vertex array.
 pub fn triangulate3d_rev(vertices: &Pt3s, normal: Pt3) -> Indices {
     assert!(vertices.len() > 3);
     const PX: u8 = 1;
@@ -223,7 +230,7 @@ pub fn triangulate3d_rev(vertices: &Pt3s, normal: Pt3) -> Indices {
     triangulate(polygon)
 }
 
-/// Triangulate a 2D polygon
+/// Triangulate a 2D polygon.
 ///
 /// vertices: The vertices of the polygon.
 ///
@@ -238,6 +245,11 @@ pub fn triangulate2d(vertices: &Pt2s) -> Indices {
     triangulate(polygon)
 }
 
+/// Triangulate a 2D polygon with vertices in CCW order.
+///
+/// vertices: The vertices of the polygon.
+///
+/// return: An array of indices into the given vertex array.
 pub fn triangulate2d_rev(vertices: &Pt2s) -> Indices {
     assert!(vertices.len() > 3);
     let mut polygon = Vec::with_capacity(vertices.len());

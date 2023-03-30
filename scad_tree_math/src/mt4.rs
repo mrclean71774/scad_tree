@@ -23,6 +23,7 @@
 
 use crate::{dcos, dsin, dtan, Pt3, Pt4};
 
+/// A matrix with column major order.
 #[derive(Clone, Copy, Default, PartialEq)]
 pub struct Mt4 {
     pub x: Pt4,

@@ -26,43 +26,54 @@ use crate::{
     triangulate3d_rev, Faces, Indices, Mt4, Pt2s, Pt3, Pt3s, Scad, ScadOp,
 };
 
+/// The points and faces of a polyhedron.
 pub struct Polyhedron {
     pub points: Pt3s,
     pub faces: Faces,
 }
 
 impl Polyhedron {
+    /// Turn the Polyhedron into a Scad.
     pub fn into_scad(self) -> Scad {
         polyhedron!(self.points, self.faces)
     }
 
+    /// Turn the Polyhedron into a Scad with the given convexity.
     pub fn into_scad_with_convexity(self, convexity: u64) -> Scad {
         polyhedron!(self.points, self.faces, convexity)
     }
 
+    /// Translate the polyhedron.
     pub fn translate(&mut self, point: Pt3) {
         self.points.translate(point);
     }
 
+    /// Apply the matrix to the polyhedron by multiplying the matrix with each point.
     pub fn apply_matrix(&mut self, matrix: &Mt4) {
         self.points.apply_matrix(matrix);
     }
 
+    /// Rotate the polyhedron around the X axis.
     pub fn rotate_x(&mut self, degrees: f64) -> &mut Self {
         self.points.rotate_x(degrees);
         self
     }
 
+    /// Rotate the polyhedron around the Y axis.
     pub fn rotate_y(&mut self, degrees: f64) -> &mut Self {
         self.points.rotate_y(degrees);
         self
     }
 
+    /// Rotate the polyhedron around the Z axis.
     pub fn rotate_z(&mut self, degrees: f64) -> &mut Self {
         self.points.rotate_z(degrees);
         self
     }
 
+    /// Extrude a 2D profile into a polyhedron.
+    ///
+    /// Most of the time you want the linear_extrude macro instead of this.
     pub fn linear_extrude(points: &Pt2s, height: f64) -> Polyhedron {
         let indices = triangulate2d_rev(points);
         let mut vertices = Pt3s::with_capacity(points.len() * 2);
@@ -107,6 +118,9 @@ impl Polyhedron {
         }
     }
 
+    /// Extrude a 2D profile into a polyhedron.
+    ///
+    /// Most of the time you want the rotate_extrude macro instead of this.
     pub fn rotate_extrude(profile: &Pt2s, degrees: f64, segments: usize) -> Self {
         assert!(degrees >= 0.0 && degrees <= 360.0);
         assert!(segments >= 3);
@@ -181,6 +195,7 @@ impl Polyhedron {
         Polyhedron { points, faces }
     }
 
+    /// Sweeps a 2D profile along a path of 3D points to make a polyhedron.
     pub fn sweep(profile: &Pt2s, path: &Pt3s, twist_degrees: f64, closed: bool) -> Self {
         let profile = Pt3s::from_pt3s(profile.iter().map(|p| p.as_pt3(0.0)).collect());
         let profile_len = profile.len();
@@ -279,11 +294,15 @@ impl Polyhedron {
         Self { points, faces }
     }
 
+    /// Create a cylinder polyhedron.
     pub fn cylinder(radius: f64, height: f64, segments: u64) -> Self {
         Self::linear_extrude(&dim2::circle(radius, segments), height)
     }
 }
 
+/// Yeilds the points of a quadratic bezier.
+///
+/// If you want to use a Viewer use QuadraticBezier3D struct instead.
 pub fn quadratic_bezier(start: Pt3, control: Pt3, end: Pt3, segments: u64) -> Pt3s {
     let delta = 1.0 / segments as f64;
     let mut points = Pt3s::new();
@@ -294,6 +313,9 @@ pub fn quadratic_bezier(start: Pt3, control: Pt3, end: Pt3, segments: u64) -> Pt
     points
 }
 
+/// Yeilds the points of a cubic bezier.
+///
+/// If you want to use a Viewer use CubicBezier3D struct instead.
 pub fn cubic_bezier(start: Pt3, control1: Pt3, control2: Pt3, end: Pt3, segments: u64) -> Pt3s {
     let delta = 1.0 / segments as f64;
     let mut points = Pt3s::new();
@@ -309,6 +331,7 @@ pub fn cubic_bezier(start: Pt3, control1: Pt3, control2: Pt3, end: Pt3, segments
     points
 }
 
+/// A 3D quadratic bezier curve.
 #[derive(Clone, Copy)]
 pub struct QuadraticBezier3D {
     pub start: Pt3,
@@ -318,6 +341,7 @@ pub struct QuadraticBezier3D {
 }
 
 impl QuadraticBezier3D {
+    /// Create a new QuadraticBezier3D.
     pub fn new(start: Pt3, control: Pt3, end: Pt3, segments: u64) -> Self {
         Self {
             start,
@@ -327,11 +351,13 @@ impl QuadraticBezier3D {
         }
     }
 
+    /// Yields the points of the curve.
     pub fn gen_points(&self) -> Pt3s {
         quadratic_bezier(self.start, self.control, self.end, self.segments)
     }
 }
 
+/// A 3d cubic bezier curve.
 #[derive(Clone, Copy)]
 pub struct CubicBezier3D {
     pub start: Pt3,
@@ -342,6 +368,7 @@ pub struct CubicBezier3D {
 }
 
 impl CubicBezier3D {
+    /// Create a CubicBezier3D.
     pub fn new(start: Pt3, control1: Pt3, control2: Pt3, end: Pt3, segments: u64) -> Self {
         Self {
             start,
@@ -352,6 +379,7 @@ impl CubicBezier3D {
         }
     }
 
+    /// Yields the points of the curve.
     pub fn gen_points(&self) -> Pt3s {
         cubic_bezier(
             self.start,
@@ -363,6 +391,7 @@ impl CubicBezier3D {
     }
 }
 
+/// Multiple cubic bezier curves linked together.
 #[derive(Clone)]
 pub struct CubicBezierChain3D {
     pub curves: Vec<CubicBezier3D>,
@@ -370,6 +399,7 @@ pub struct CubicBezierChain3D {
 }
 
 impl CubicBezierChain3D {
+    /// Create the start of the chain.
     pub fn new(start: Pt3, control1: Pt3, control2: Pt3, end: Pt3, segments: u64) -> Self {
         Self {
             curves: vec![CubicBezier3D {
@@ -383,6 +413,7 @@ impl CubicBezierChain3D {
         }
     }
 
+    /// Add an additional curve to the chain.
     pub fn add(
         &mut self,
         control1_length: f64,
@@ -402,6 +433,7 @@ impl CubicBezierChain3D {
         self
     }
 
+    /// Connect the ends of the chain to form a closed profile.
     pub fn close(
         &mut self,
         control1_length: f64,
@@ -416,6 +448,7 @@ impl CubicBezierChain3D {
             chain_end.end + (chain_end.end - chain_end.control2).normalized() * start_control1_len;
     }
 
+    /// Yields the points of the curve.
     pub fn gen_points(&self) -> Pt3s {
         let mut pts = Pt3s::from_pt3s(vec![Pt3::new(0.0, 0.0, 0.0)]);
         for i in 0..self.curves.len() {

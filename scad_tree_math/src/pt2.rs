@@ -23,6 +23,7 @@
 
 use crate::{dcos, dsin, Pt3};
 
+/// Wraps a `Vec<Pt2>`.
 #[derive(Clone, PartialEq)]
 pub struct Pt2s {
     inner: Vec<Pt2>,
@@ -81,6 +82,7 @@ impl Pt2s {
     }
 }
 
+/// A 2D point.
 #[derive(Clone, Copy, Debug, Default, PartialEq)]
 pub struct Pt2 {
     pub x: f64,

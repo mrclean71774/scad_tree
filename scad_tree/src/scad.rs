@@ -528,6 +528,7 @@ impl std::fmt::Display for Scad {
     }
 }
 
+/// Enum of all the named OpenSCAD colors
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum ScadColor {
     Lavender,
@@ -682,7 +683,7 @@ pub enum TextHalign {
     right,
 }
 
-/// The way for vertical alignment of text.
+/// The ways for vertical alignment of text.
 #[allow(non_camel_case_types)]
 #[derive(Clone, Copy, PartialEq, Debug)]
 pub enum TextValign {
@@ -702,6 +703,10 @@ pub enum TextDirection {
     btt, // bottom to top
 }
 
+/// Text macro parameters
+///
+/// There are numerous parameters that can be passed to the text macro. This struct
+/// can be passed instead for convenience.
 #[derive(Clone)]
 pub struct TextParams {
     pub text: String,
@@ -733,7 +738,9 @@ impl Default for TextParams {
     }
 }
 
-/// Saves Scad objects to a file and allows setting global $fa, $fs, or $fn. $fn overrides $fa and
+/// Saves Scad objects to a file.
+///
+/// Allows setting global $fa, $fs, or $fn. $fn overrides $fa and
 /// $fs so cannot be specified with $fa or $fs.
 ///
 /// #params

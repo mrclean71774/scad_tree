@@ -21,13 +21,24 @@
 // SOFTWARE.
 //
 
+//! The scad_tree library is a library for generating OpenSCAD code from Rust.
+//!
+//! Notes on usage:
+//! * 2D profiles for non-OpenSCAD functions/macros are specified by points in
+//!     clockwise order.
+//! * Polyhedron faces are specified in clockwise order.
+
+/// Module for the creation of 2D profiles and curves.
 pub mod dim2;
+/// Module for the creation of 3D curves and polyhedrons.
 pub mod dim3;
+/// Module for metric threaded rod, nuts and bolts.
 pub mod metric_thread;
 mod scad;
 mod triangulate;
 mod viewer;
 
+/// Module for quickly importing library types and macros.
 pub mod prelude {
     pub use {
         crate::{
@@ -55,6 +66,7 @@ pub use {
     viewer::Viewer,
 };
 
+/// Wraps a `Vec<u64>`.
 #[derive(Clone, PartialEq)]
 pub struct Indices {
     inner: Vec<u64>,
@@ -85,15 +97,20 @@ impl std::fmt::Display for Indices {
 }
 
 impl Indices {
+    /// Create an empty Indices.
     pub fn new() -> Self {
         Self { inner: Vec::new() }
     }
 
+    /// Create Indices from a `Vec<u64>`.
     pub fn from_indices(indices: Vec<u64>) -> Self {
         Self { inner: indices }
     }
 }
 
+/// Paths wrap a `Vec<Indices>`.
+///
+/// Used for polygon macro. Faces is an alias used for polyhedron macro.
 #[derive(Clone, PartialEq)]
 pub struct Paths {
     inner: Vec<Indices>,
@@ -124,27 +141,40 @@ impl std::fmt::Display for Paths {
 }
 
 impl Paths {
+    /// Create an empty Paths.
     pub fn new() -> Self {
         Self { inner: Vec::new() }
     }
 
+    /// Create a Paths with the given capacity.
     pub fn with_capacity(capacity: usize) -> Self {
         Self {
             inner: Vec::with_capacity(capacity),
         }
     }
 
+    /// Create a Paths from a `Vec<Indices>`.
+    ///
+    /// Duplicate of from_faces for readability.
     pub fn from_paths(paths: Vec<Indices>) -> Self {
         Self { inner: paths }
     }
 
+    /// Create a Paths from a `Vec<Indices>`.
+    ///
+    /// Duplicate of from_paths for readability.
     pub fn from_faces(faces: Vec<Indices>) -> Self {
         Self { inner: faces }
     }
 }
 
+/// Alias for Paths.
 pub type Faces = Paths;
 
+/// Runs a code block in a separate thread.
+///
+/// The thread has a stack size of 32 megabytes to avoid stack overflow
+/// do to recursion. Automatically used by the scad_file macro.
 #[macro_export]
 macro_rules! fat_thread {
     ($code:block) => {

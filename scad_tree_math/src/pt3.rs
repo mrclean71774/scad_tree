@@ -23,6 +23,7 @@
 
 use crate::{dcos, dsin, Mt4, Pt4};
 
+/// Wraps a `Vec<Pt3>`.
 #[derive(Clone, PartialEq)]
 pub struct Pt3s {
     inner: Vec<Pt3>,
@@ -101,6 +102,7 @@ impl Pt3s {
     }
 }
 
+/// A 3D point.
 #[derive(Clone, Copy, Debug, Default, PartialEq)]
 pub struct Pt3 {
     pub x: f64,
