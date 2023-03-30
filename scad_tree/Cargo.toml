@@ -1,6 +1,6 @@
 [package]
 name = "scad_tree"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2021"
 description = "Generate OpenSCAD code from Rust."
 license = "MIT"
@@ -13,4 +13,4 @@ readme = "../README.md"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-scad_tree_math = {version = "0.1.0", path="../scad_tree_math"}
+scad_tree_math = {version = "0.1.x", path="../scad_tree_math"}
