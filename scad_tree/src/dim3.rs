@@ -27,6 +27,7 @@ use crate::{
 };
 
 /// The points and faces of a polyhedron.
+#[derive(Clone)]
 pub struct Polyhedron {
     pub points: Pt3s,
     pub faces: Faces,
