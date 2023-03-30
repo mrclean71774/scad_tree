@@ -34,6 +34,8 @@ pub mod dim2;
 pub mod dim3;
 /// Module for metric threaded rod, nuts and bolts.
 pub mod metric_thread;
+
+mod pipe;
 mod scad;
 mod triangulate;
 mod viewer;
@@ -46,7 +48,7 @@ pub mod prelude {
             intersection, linear_extrude, metric_thread, minkowski, mirror, polygon, polyhedron,
             projection, resize, rotate, rotate_extrude, scad_file, scale, sphere, square, surface,
             text, translate, union, BezierStar, CubicBezier2D, CubicBezier3D, CubicBezierChain2D,
-            CubicBezierChain3D, Faces, Indices, Paths, Polyhedron, Pt2, Pt2s, Pt3, Pt3s, Pt4,
+            CubicBezierChain3D, Faces, Indices, Paths, Pipe, Polyhedron, Pt2, Pt2s, Pt3, Pt3s, Pt4,
             QuadraticBezier2D, QuadraticBezier3D, Scad, ScadColor, ScadOp, TextDirection,
             TextHalign, TextParams, TextValign, Viewer,
         },
@@ -57,6 +59,7 @@ pub mod prelude {
 pub use {
     dim2::{BezierStar, CubicBezier2D, CubicBezierChain2D, QuadraticBezier2D},
     dim3::{CubicBezier3D, CubicBezierChain3D, Polyhedron, QuadraticBezier3D},
+    pipe::Pipe,
     scad::{Scad, ScadColor, ScadOp, TextDirection, TextHalign, TextParams, TextValign},
     scad_tree_math::{
         approx_eq, dacos, dasin, datan, dcos, dsin, dtan, MersenneTwister, Mt4, Pt2, Pt2s, Pt3,
