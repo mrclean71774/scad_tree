@@ -1,6 +1,6 @@
 # scad_tree
 
-A Rust solid modeling library that generates [OpenSCAD](openscad.org) code.
+A [Rust](rust-lang.org) solid modeling library that generates [OpenSCAD](openscad.org) code.
 
 To use this library in your project add this to your Cargo.toml.
 
