@@ -9,6 +9,13 @@ To use this library in your project add this to your Cargo.toml.
 scad_tree = { git="https://github.com/mrclean71774/scad_tree" }
 ```
 
+Or you can get it from crates.io.
+
+```toml
+[dependencies]
+scad_tree = "0.1.0"
+```
+
 To run the examples clone this repository and from the root folder run
 
 ```text
