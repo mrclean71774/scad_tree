@@ -1,6 +1,6 @@
 # scad_tree
 
-A [Rust](rust-lang.org) solid modeling library that generates [OpenSCAD](openscad.org) code.
+A [Rust](https://rust-lang.org) solid modeling library that generates [OpenSCAD](https://openscad.org) code.
 
 To use this library in your project add this to your Cargo.toml.
 
@@ -26,7 +26,7 @@ cargo run --example example_name
 
 ---
 
-A [Blender](blender.org) render of metric thread parts.
+A [Blender](https://blender.org) render of metric thread parts.
 ![metric_thread.png](https://github.com/mrclean71774/scad_tree/blob/main/images/metric_thread.png)
 
 A photo of my bottle example 3D printed.
