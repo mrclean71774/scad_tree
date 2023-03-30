@@ -1,6 +1,6 @@
 [package]
 name = "scad_tree_math"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 description = "Math library for scad_tree"
 license = "MIT"
