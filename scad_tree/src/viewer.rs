@@ -276,6 +276,12 @@ impl Viewer {
         }
     }
 
+    pub fn add_cubic_bezier_chain3d(&mut self, curve: &CubicBezierChain3D) {
+        for c in &curve.curves {
+            self.add_cubic_bezier3d(c);
+        }
+    }
+
     pub fn add_bezier_star(&mut self, star: &BezierStar) {
         self.add_cubic_bezier_chain2d(&star.chain);
     }
