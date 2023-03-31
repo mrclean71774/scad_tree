@@ -183,7 +183,7 @@ macro_rules! fat_thread {
     ($code:block) => {
         std::thread::Builder::new()
             .stack_size(32 * 1024 * 1024)
-            .spawn(|| $code)
+            .spawn(move || $code)
             .unwrap()
     };
 }

@@ -222,6 +222,18 @@ impl Scad {
         result
     }
 
+    /// Create a circular array around the Z axis
+    pub fn polar_array(scad: &Scad, count: u64, degrees: f64) -> Scad {
+        assert!(degrees <= 360.0);
+        let steps = if degrees == 360.0 { count } else { count - 1 };
+        let mut result = scad.clone();
+        for i in 0..count {
+            let a = i as f64 * -degrees / steps as f64;
+            result = result + rotate!([0.0, 0.0, a], scad.clone(););
+        }
+        result
+    }
+
     pub fn save(&self, path: &str) {
         let s = format!("{}", self);
         let mut file = std::fs::File::create(path).unwrap();
@@ -1830,6 +1842,8 @@ macro_rules! cube {
 ///
 /// cylinder!('height: f64', 'radius: f64')
 ///
+/// cylinder!('height: f64', 'radius: f64', fn='fn: u64')
+///
 /// cylinder!('height: f64', 'radius1: f64', 'radius2: f64')
 ///
 /// cylinder!('height: f64', 'radius1: f64', 'radius2: f64', 'center: bool')
@@ -2245,6 +2259,20 @@ macro_rules! cylinder {
                 fa: None,
                 fs: None,
                 fn_: None,
+            },
+            children: Vec::new(),
+        }
+    };
+    ($height:expr, $radius:expr, fn=$fn:expr) => {
+        Scad {
+            op: ScadOp::Cylinder {
+                height: $height,
+                radius1: $radius,
+                radius2: $radius,
+                center: false,
+                fa: None,
+                fs: None,
+                fn_: Some($fn),
             },
             children: Vec::new(),
         }
