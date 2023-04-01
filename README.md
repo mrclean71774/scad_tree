@@ -13,7 +13,7 @@ Or you can get it from crates.io.
 
 ```toml
 [dependencies]
-scad_tree = "0.1"
+scad_tree = "0.2.x"
 ```
 
 To run the examples clone this repository and from the root folder run

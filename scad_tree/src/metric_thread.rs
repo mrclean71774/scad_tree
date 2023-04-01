@@ -481,8 +481,6 @@ pub fn threaded_rod(
 ///
 /// chamfered: Whether or not to chamfer the top and bottom of the head.
 ///
-/// chamfer_size: The size of the chamfer.
-///
 /// left_hand_thread: lefty tighty?
 ///
 /// center: Center vertically.
@@ -495,7 +493,6 @@ pub fn hex_bolt(
     segments: u64,
     lead_in_degrees: f64,
     chamfered: bool,
-    chamfer_size: f64,
     left_hand_thread: bool,
     center: bool,
 ) -> Scad {
@@ -524,6 +521,7 @@ pub fn hex_bolt(
     )
     .into_scad();
     if chamfered {
+        let chamfer_size = thread_info["chamfer_size"];
         head = head
             - Scad::external_cylinder_chamfer(
                 chamfer_size,
@@ -585,8 +583,6 @@ pub fn tap(m: i32, length: f64, segments: u64, left_hand_thread: bool, center: b
 ///
 /// chamfered: Adds a chamfer to the nut.
 ///
-/// chamfer_size: The size of the chamfer, leave at 0.0 for the default size.
-///
 /// left_hand_thread: lefty tighty?
 ///
 /// center: Center horizontally.
@@ -597,7 +593,6 @@ pub fn hex_nut(
     height: f64,
     segments: u64,
     chamfered: bool,
-    chamfer_size: f64,
     left_hand_thread: bool,
     center: bool,
 ) -> Scad {
@@ -613,6 +608,7 @@ pub fn hex_nut(
 
     let mut nut = nut_blank - nut_tap;
     if chamfered {
+        let chamfer_size = thread_info["chamfer_size"];
         nut = nut
             - Scad::external_cylinder_chamfer(
                 chamfer_size,
@@ -641,6 +637,7 @@ fn m_table() -> HashMap<i32, HashMap<&'static str, f64>> {
                 ("external_dMaj", 1.886),
                 ("internal_dMaj", 2.148),
                 ("nut_width", 4.0),
+                ("chamfer_size", 1.45),
             ]),
         ),
         (
@@ -650,6 +647,7 @@ fn m_table() -> HashMap<i32, HashMap<&'static str, f64>> {
                 ("external_dMaj", 2.874),
                 ("internal_dMaj", 3.172),
                 ("nut_width", 5.5),
+                ("chamfer_size", 1.6),
             ]),
         ),
         (
@@ -659,6 +657,7 @@ fn m_table() -> HashMap<i32, HashMap<&'static str, f64>> {
                 ("external_dMaj", 3.838),
                 ("internal_dMaj", 4.219),
                 ("nut_width", 7.0),
+                ("chamfer_size", 1.8),
             ]),
         ),
         (
@@ -668,6 +667,7 @@ fn m_table() -> HashMap<i32, HashMap<&'static str, f64>> {
                 ("external_dMaj", 4.826),
                 ("internal_dMaj", 5.24),
                 ("nut_width", 8.0),
+                ("chamfer_size", 1.9),
             ]),
         ),
         (
@@ -677,6 +677,7 @@ fn m_table() -> HashMap<i32, HashMap<&'static str, f64>> {
                 ("external_dMaj", 5.794),
                 ("internal_dMaj", 6.294),
                 ("nut_width", 10.0),
+                ("chamfer_size", 2.1),
             ]),
         ),
         // nut_width made up for next entry
@@ -687,6 +688,7 @@ fn m_table() -> HashMap<i32, HashMap<&'static str, f64>> {
                 ("external_dMaj", 6.794),
                 ("internal_dMaj", 7.294),
                 ("nut_width", 13.0),
+                ("chamfer_size", 2.45),
             ]),
         ),
         (
@@ -696,6 +698,7 @@ fn m_table() -> HashMap<i32, HashMap<&'static str, f64>> {
                 ("external_dMaj", 7.76),
                 ("internal_dMaj", 8.34),
                 ("nut_width", 13.0),
+                ("chamfer_size", 2.45),
             ]),
         ),
         // nut_width made up for next entry
@@ -706,6 +709,7 @@ fn m_table() -> HashMap<i32, HashMap<&'static str, f64>> {
                 ("external_dMaj", 8.76),
                 ("internal_dMaj", 9.34),
                 ("nut_width", 16.0),
+                ("chamfer_size", 2.8),
             ]),
         ),
         (
@@ -715,6 +719,7 @@ fn m_table() -> HashMap<i32, HashMap<&'static str, f64>> {
                 ("external_dMaj", 9.732),
                 ("internal_dMaj", 10.396),
                 ("nut_width", 16.0),
+                ("chamfer_size", 2.8),
             ]),
         ),
         // nut_width made up for next entry
@@ -725,6 +730,7 @@ fn m_table() -> HashMap<i32, HashMap<&'static str, f64>> {
                 ("external_dMaj", 10.73),
                 ("internal_dMaj", 11.387),
                 ("nut_width", 18.0),
+                ("chamfer_size", 3.0),
             ]),
         ),
         (
@@ -734,6 +740,7 @@ fn m_table() -> HashMap<i32, HashMap<&'static str, f64>> {
                 ("external_dMaj", 11.7),
                 ("internal_dMaj", 12.453),
                 ("nut_width", 18.0),
+                ("chamfer_size", 3.0),
             ]),
         ),
         (
@@ -743,6 +750,7 @@ fn m_table() -> HashMap<i32, HashMap<&'static str, f64>> {
                 ("external_dMaj", 13.68),
                 ("internal_dMaj", 14.501),
                 ("nut_width", 21.0),
+                ("chamfer_size", 3.35),
             ]),
         ),
         // nut_width made up for next entry
@@ -753,6 +761,7 @@ fn m_table() -> HashMap<i32, HashMap<&'static str, f64>> {
                 ("external_dMaj", 14.73),
                 ("internal_dMaj", 15.407),
                 ("nut_width", 24.0),
+                ("chamfer_size", 3.7),
             ]),
         ),
         (
@@ -762,6 +771,7 @@ fn m_table() -> HashMap<i32, HashMap<&'static str, f64>> {
                 ("external_dMaj", 15.68),
                 ("internal_dMaj", 16.501),
                 ("nut_width", 24.0),
+                ("chamfer_size", 3.7),
             ]),
         ),
         // nut_width made up for next entry
@@ -772,6 +782,7 @@ fn m_table() -> HashMap<i32, HashMap<&'static str, f64>> {
                 ("external_dMaj", 16.73),
                 ("internal_dMaj", 17.407),
                 ("nut_width", 27.0),
+                ("chamfer_size", 3.9),
             ]),
         ),
         (
@@ -781,6 +792,7 @@ fn m_table() -> HashMap<i32, HashMap<&'static str, f64>> {
                 ("external_dMaj", 17.62),
                 ("internal_dMaj", 18.585),
                 ("nut_width", 27.0),
+                ("chamfer_size", 3.9),
             ]),
         ),
         (
@@ -790,6 +802,7 @@ fn m_table() -> HashMap<i32, HashMap<&'static str, f64>> {
                 ("external_dMaj", 19.62),
                 ("internal_dMaj", 20.585),
                 ("nut_width", 30.0),
+                ("chamfer_size", 4.25),
             ]),
         ),
         (
@@ -799,6 +812,7 @@ fn m_table() -> HashMap<i32, HashMap<&'static str, f64>> {
                 ("external_dMaj", 21.58),
                 ("internal_dMaj", 22.677),
                 ("nut_width", 34.0),
+                ("chamfer_size", 4.75),
             ]),
         ),
         (
@@ -808,6 +822,7 @@ fn m_table() -> HashMap<i32, HashMap<&'static str, f64>> {
                 ("external_dMaj", 23.58),
                 ("internal_dMaj", 24.698),
                 ("nut_width", 36.0),
+                ("chamfer_size", 4.9),
             ]),
         ),
         // nut_width made up for next entry
@@ -818,6 +833,7 @@ fn m_table() -> HashMap<i32, HashMap<&'static str, f64>> {
                 ("external_dMaj", 24.68),
                 ("internal_dMaj", 25.513),
                 ("nut_width", 41.0),
+                ("chamfer_size", 5.5),
             ]),
         ),
         // nut_width made up for next entry
@@ -828,6 +844,7 @@ fn m_table() -> HashMap<i32, HashMap<&'static str, f64>> {
                 ("external_dMaj", 25.73),
                 ("internal_dMaj", 26.417),
                 ("nut_width", 41.0),
+                ("chamfer_size", 5.5),
             ]),
         ),
         (
@@ -837,6 +854,7 @@ fn m_table() -> HashMap<i32, HashMap<&'static str, f64>> {
                 ("external_dMaj", 26.58),
                 ("internal_dMaj", 27.698),
                 ("nut_width", 41.0),
+                ("chamfer_size", 5.5),
             ]),
         ),
         // nut_width made up for next entry
@@ -847,6 +865,7 @@ fn m_table() -> HashMap<i32, HashMap<&'static str, f64>> {
                 ("external_dMaj", 27.68),
                 ("internal_dMaj", 28.513),
                 ("nut_width", 46.0),
+                ("chamfer_size", 6.0),
             ]),
         ),
         (
@@ -856,6 +875,7 @@ fn m_table() -> HashMap<i32, HashMap<&'static str, f64>> {
                 ("external_dMaj", 29.52),
                 ("internal_dMaj", 30.785),
                 ("nut_width", 46.0),
+                ("chamfer_size", 6.0),
             ]),
         ),
         // nut_width made up for next entry
@@ -866,6 +886,7 @@ fn m_table() -> HashMap<i32, HashMap<&'static str, f64>> {
                 ("external_dMaj", 31.68),
                 ("internal_dMaj", 32.513),
                 ("nut_width", 49.0),
+                ("chamfer_size", 6.4),
             ]),
         ),
         (
@@ -875,6 +896,7 @@ fn m_table() -> HashMap<i32, HashMap<&'static str, f64>> {
                 ("external_dMaj", 32.54),
                 ("internal_dMaj", 33.785),
                 ("nut_width", 49.0),
+                ("chamfer_size", 6.4),
             ]),
         ),
         // nut_width made up for next entry
@@ -885,6 +907,7 @@ fn m_table() -> HashMap<i32, HashMap<&'static str, f64>> {
                 ("external_dMaj", 34.73),
                 ("internal_dMaj", 35.416),
                 ("nut_width", 55.0),
+                ("chamfer_size", 7.0),
             ]),
         ),
         (
@@ -894,6 +917,7 @@ fn m_table() -> HashMap<i32, HashMap<&'static str, f64>> {
                 ("external_dMaj", 35.47),
                 ("internal_dMaj", 36.877),
                 ("nut_width", 55.0),
+                ("chamfer_size", 7.0),
             ]),
         ),
         // nut_width made up for next entry
@@ -904,6 +928,7 @@ fn m_table() -> HashMap<i32, HashMap<&'static str, f64>> {
                 ("external_dMaj", 37.73),
                 ("internal_dMaj", 38.417),
                 ("nut_width", 60.0),
+                ("chamfer_size", 7.5),
             ]),
         ),
         (
@@ -913,6 +938,7 @@ fn m_table() -> HashMap<i32, HashMap<&'static str, f64>> {
                 ("external_dMaj", 38.47),
                 ("internal_dMaj", 39.877),
                 ("nut_width", 60.0),
+                ("chamfer_size", 7.5),
             ]),
         ),
         // nut_width made up for next entry
@@ -923,6 +949,7 @@ fn m_table() -> HashMap<i32, HashMap<&'static str, f64>> {
                 ("external_dMaj", 39.58),
                 ("internal_dMaj", 40.698),
                 ("nut_width", 65.0),
+                ("chamfer_size", 8.2),
             ]),
         ),
         (
@@ -932,6 +959,7 @@ fn m_table() -> HashMap<i32, HashMap<&'static str, f64>> {
                 ("external_dMaj", 41.44),
                 ("internal_dMaj", 42.965),
                 ("nut_width", 65.0),
+                ("chamfer_size", 8.2),
             ]),
         ),
         (
@@ -941,6 +969,7 @@ fn m_table() -> HashMap<i32, HashMap<&'static str, f64>> {
                 ("external_dMaj", 44.44),
                 ("internal_dMaj", 45.965),
                 ("nut_width", 70.0),
+                ("chamfer_size", 8.75),
             ]),
         ),
         (
@@ -950,6 +979,7 @@ fn m_table() -> HashMap<i32, HashMap<&'static str, f64>> {
                 ("external_dMaj", 47.4),
                 ("internal_dMaj", 49.057),
                 ("nut_width", 75.0),
+                ("chamfer_size", 9.25),
             ]),
         ),
         // nut_width made up for next entry
@@ -960,6 +990,7 @@ fn m_table() -> HashMap<i32, HashMap<&'static str, f64>> {
                 ("external_dMaj", 49.47),
                 ("internal_dMaj", 50.892),
                 ("nut_width", 80.0),
+                ("chamfer_size", 9.5),
             ]),
         ),
         (
@@ -969,6 +1000,7 @@ fn m_table() -> HashMap<i32, HashMap<&'static str, f64>> {
                 ("external_dMaj", 51.4),
                 ("internal_dMaj", 53.037),
                 ("nut_width", 80.0),
+                ("chamfer_size", 9.5),
             ]),
         ),
         // nut_width made up for next entry
@@ -979,6 +1011,7 @@ fn m_table() -> HashMap<i32, HashMap<&'static str, f64>> {
                 ("external_dMaj", 54.47),
                 ("internal_dMaj", 55.892),
                 ("nut_width", 85.0),
+                ("chamfer_size", 10.25),
             ]),
         ),
         (
@@ -988,6 +1021,7 @@ fn m_table() -> HashMap<i32, HashMap<&'static str, f64>> {
                 ("external_dMaj", 55.37),
                 ("internal_dMaj", 57.149),
                 ("nut_width", 85.0),
+                ("chamfer_size", 10.25),
             ]),
         ),
         // nut_width made up for next entry
@@ -998,6 +1032,7 @@ fn m_table() -> HashMap<i32, HashMap<&'static str, f64>> {
                 ("external_dMaj", 57.47),
                 ("internal_dMaj", 58.892),
                 ("nut_width", 90.0),
+                ("chamfer_size", 10.75),
             ]),
         ),
         (
@@ -1007,6 +1042,7 @@ fn m_table() -> HashMap<i32, HashMap<&'static str, f64>> {
                 ("external_dMaj", 59.37),
                 ("internal_dMaj", 61.149),
                 ("nut_width", 90.0),
+                ("chamfer_size", 10.75),
             ]),
         ),
         // nut_width made up for next entry
@@ -1017,6 +1053,7 @@ fn m_table() -> HashMap<i32, HashMap<&'static str, f64>> {
                 ("external_dMaj", 61.47),
                 ("internal_dMaj", 62.892),
                 ("nut_width", 95.0),
+                ("chamfer_size", 11.25),
             ]),
         ),
         // nut_width made up for next entry
@@ -1027,6 +1064,7 @@ fn m_table() -> HashMap<i32, HashMap<&'static str, f64>> {
                 ("external_dMaj", 62.73),
                 ("internal_dMaj", 63.429),
                 ("nut_width", 95.0),
+                ("chamfer_size", 11.25),
             ]),
         ),
         (
@@ -1036,6 +1074,7 @@ fn m_table() -> HashMap<i32, HashMap<&'static str, f64>> {
                 ("external_dMaj", 63.32),
                 ("internal_dMaj", 65.421),
                 ("nut_width", 95.0),
+                ("chamfer_size", 11.25),
             ]),
         ),
         // nut_width made up for next entry
@@ -1046,6 +1085,7 @@ fn m_table() -> HashMap<i32, HashMap<&'static str, f64>> {
                 ("external_dMaj", 64.47),
                 ("internal_dMaj", 65.892),
                 ("nut_width", 100.0),
+                ("chamfer_size", 11.75),
             ]),
         ),
         // nut_width made up for next entry
@@ -1056,6 +1096,7 @@ fn m_table() -> HashMap<i32, HashMap<&'static str, f64>> {
                 ("external_dMaj", 67.32),
                 ("internal_dMaj", 69.241),
                 ("nut_width", 100.0),
+                ("chamfer_size", 11.75),
             ]),
         ),
         // nut_width made up for next entry
@@ -1066,6 +1107,7 @@ fn m_table() -> HashMap<i32, HashMap<&'static str, f64>> {
                 ("external_dMaj", 69.32),
                 ("internal_dMaj", 71.241),
                 ("nut_width", 100.0),
+                ("chamfer_size", 11.75),
             ]),
         ),
         // nut_width made up for next entry
@@ -1076,6 +1118,7 @@ fn m_table() -> HashMap<i32, HashMap<&'static str, f64>> {
                 ("external_dMaj", 71.32),
                 ("internal_dMaj", 73.241),
                 ("nut_width", 110.0),
+                ("chamfer_size", 13.0),
             ]),
         ),
         // nut_width made up for next entry
@@ -1086,6 +1129,7 @@ fn m_table() -> HashMap<i32, HashMap<&'static str, f64>> {
                 ("external_dMaj", 74.32),
                 ("internal_dMaj", 76.241),
                 ("nut_width", 110.0),
+                ("chamfer_size", 13.0),
             ]),
         ),
         // nut_width made up for next entry
@@ -1096,6 +1140,7 @@ fn m_table() -> HashMap<i32, HashMap<&'static str, f64>> {
                 ("external_dMaj", 75.32),
                 ("internal_dMaj", 77.241),
                 ("nut_width", 110.0),
+                ("chamfer_size", 13.0),
             ]),
         ),
         // nut_width made up for next entry
@@ -1106,6 +1151,7 @@ fn m_table() -> HashMap<i32, HashMap<&'static str, f64>> {
                 ("external_dMaj", 77.68),
                 ("internal_dMaj", 78.525),
                 ("nut_width", 120.0),
+                ("chamfer_size", 14.25),
             ]),
         ),
         // nut_width made up for next entry
@@ -1116,6 +1162,7 @@ fn m_table() -> HashMap<i32, HashMap<&'static str, f64>> {
                 ("external_dMaj", 79.32),
                 ("internal_dMaj", 81.241),
                 ("nut_width", 120.0),
+                ("chamfer_size", 14.25),
             ]),
         ),
         // nut_width made up for next entry
@@ -1126,6 +1173,7 @@ fn m_table() -> HashMap<i32, HashMap<&'static str, f64>> {
                 ("external_dMaj", 81.68),
                 ("internal_dMaj", 82.525),
                 ("nut_width", 120.0),
+                ("chamfer_size", 14.25),
             ]),
         ),
         // nut_width made up for next entry
@@ -1136,6 +1184,7 @@ fn m_table() -> HashMap<i32, HashMap<&'static str, f64>> {
                 ("external_dMaj", 84.32),
                 ("internal_dMaj", 86.241),
                 ("nut_width", 130.0),
+                ("chamfer_size", 15.25),
             ]),
         ),
         // nut_width made up for next entry
@@ -1146,6 +1195,7 @@ fn m_table() -> HashMap<i32, HashMap<&'static str, f64>> {
                 ("external_dMaj", 89.32),
                 ("internal_dMaj", 91.241),
                 ("nut_width", 130.0),
+                ("chamfer_size", 15.25),
             ]),
         ),
         // nut_width made up for next entry
@@ -1156,6 +1206,7 @@ fn m_table() -> HashMap<i32, HashMap<&'static str, f64>> {
                 ("external_dMaj", 94.32),
                 ("internal_dMaj", 96.266),
                 ("nut_width", 130.0),
+                ("chamfer_size", 15.25),
             ]),
         ),
         // nut_width made up for next entry
@@ -1166,6 +1217,7 @@ fn m_table() -> HashMap<i32, HashMap<&'static str, f64>> {
                 ("external_dMaj", 99.32),
                 ("internal_dMaj", 101.27),
                 ("nut_width", 140.0),
+                ("chamfer_size", 16.5),
             ]),
         ),
     ])
