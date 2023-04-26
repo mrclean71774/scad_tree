@@ -30,7 +30,7 @@ pub struct Viewer {
     point_radius: f64,
     edge_radius: f64,
     segments: u64,
-    scad: Option<Box<Scad>>,
+    scad: Option<Scad>,
 }
 
 impl Viewer {
@@ -50,9 +50,9 @@ impl Viewer {
             );
         );
         if let Some(scad) = &mut self.scad {
-            self.scad = Some(Box::new(*scad.clone() + s));
+            self.scad = Some(scad.clone() + s);
         } else {
-            self.scad = Some(Box::new(s));
+            self.scad = Some(s);
         }
     }
 
@@ -63,9 +63,9 @@ impl Viewer {
             );
         );
         if let Some(scad) = &mut self.scad {
-            self.scad = Some(Box::new(*scad.clone() + s));
+            self.scad = Some(scad.clone() + s);
         } else {
-            self.scad = Some(Box::new(s));
+            self.scad = Some(s);
         }
     }
 
@@ -87,15 +87,15 @@ impl Viewer {
             children,
         };
         if let Some(scad) = &mut self.scad {
-            self.scad = Some(Box::new(Scad {
+            self.scad = Some(Scad {
                 op: ScadOp::Union,
-                children: vec![*scad.clone(), child],
-            }));
+                children: vec![scad.clone(), child],
+            });
         } else {
-            self.scad = Some(Box::new(Scad {
+            self.scad = Some(Scad {
                 op: ScadOp::Union,
                 children: vec![child],
-            }));
+            });
         }
     }
 
@@ -117,15 +117,15 @@ impl Viewer {
             children,
         };
         if let Some(scad) = &mut self.scad {
-            self.scad = Some(Box::new(Scad {
+            self.scad = Some(Scad {
                 op: ScadOp::Union,
-                children: vec![*scad.clone(), child],
-            }));
+                children: vec![scad.clone(), child],
+            });
         } else {
-            self.scad = Some(Box::new(Scad {
+            self.scad = Some(Scad {
                 op: ScadOp::Union,
                 children: vec![child],
-            }));
+            });
         }
     }
 
@@ -151,15 +151,15 @@ impl Viewer {
             children,
         };
         if let Some(scad) = &mut self.scad {
-            self.scad = Some(Box::new(Scad {
+            self.scad = Some(Scad {
                 op: ScadOp::Union,
-                children: vec![*scad.clone(), child],
-            }));
+                children: vec![scad.clone(), child],
+            });
         } else {
-            self.scad = Some(Box::new(Scad {
+            self.scad = Some(Scad {
                 op: ScadOp::Union,
                 children: vec![child],
-            }));
+            });
         }
     }
 
@@ -184,15 +184,15 @@ impl Viewer {
             children,
         };
         if let Some(scad) = &mut self.scad {
-            self.scad = Some(Box::new(Scad {
+            self.scad = Some(Scad {
                 op: ScadOp::Union,
-                children: vec![*scad.clone(), child],
-            }));
+                children: vec![scad.clone(), child],
+            });
         } else {
-            self.scad = Some(Box::new(Scad {
+            self.scad = Some(Scad {
                 op: ScadOp::Union,
                 children: vec![child],
-            }));
+            });
         }
     }
 
@@ -287,6 +287,6 @@ impl Viewer {
     }
 
     pub fn into_scad(self) -> Scad {
-        *self.scad.unwrap()
+        self.scad.unwrap()
     }
 }
