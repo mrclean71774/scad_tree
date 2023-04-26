@@ -27,7 +27,7 @@
 use scad_tree::prelude::*;
 
 fn main() {
-    scad_file!("output/k40_air_assist.scad",
+    scad_file!(32, "output/k40_air_assist.scad",
         union!(
             translate!([0.0, 0.0, 50.8],
                 Pipe::straight(30.0, 2.0, 8.0, false, 50);

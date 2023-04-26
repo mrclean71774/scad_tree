@@ -750,12 +750,14 @@ impl Default for TextParams {
     }
 }
 
-/// Saves Scad objects to a file.
+/// Saves Scad objects to a file in a separate thread.
 ///
 /// Allows setting global $fa, $fs, or $fn. $fn overrides $fa and
 /// $fs so cannot be specified with $fa or $fs.
 ///
 /// #params
+///
+/// stack_size: The size of the stack in megabytes.
 ///
 /// path: The path of the file to save.
 ///
@@ -769,19 +771,19 @@ impl Default for TextParams {
 ///
 /// #patterns
 ///
-/// scad_file!('path: &str', 'children: Scad';);
+/// scad_file!('stack_size: usize', 'path: &str', 'children: Scad';);
 ///
-/// scad_file!('path: &str', fa='fa: f64', 'children: Scad';);
+/// scad_file!('stack_size: usize', 'path: &str', fa='fa: f64', 'children: Scad';);
 ///
-/// scad_file!('path: &str', fs='fs: f64', 'children: Scad';);
+/// scad_file!('stack_size: usize', 'path: &str', fs='fs: f64', 'children: Scad';);
 ///
-/// scad_file!('path: &str', fa='fa: f64', fs='fs: f64', 'children: Scad';);
+/// scad_file!('stack_size: usize', 'path: &str', fa='fa: f64', fs='fs: f64', 'children: Scad';);
 ///
-/// scad_file!('path: &str', fn='fn: u64', 'children: Scad';);
+/// scad_file!('stack_size: usize', 'path: &str', fn='fn: u64', 'children: Scad';);
 #[macro_export]
 macro_rules! scad_file {
-    ($path:expr, fa=$fa:expr, fs=$fs:expr, $($child:expr);+;) => {
-        let t = fat_thread!({
+    ($stack_size:expr, $path:expr, fa=$fa:expr, fs=$fs:expr, $($child:expr);+;) => {
+        let t = fat_thread!($stack_size, {
             let children = vec![$($child,)+];
             let mut file = std::fs::File::create($path).unwrap();
             file.write(format!("$fa={};\n", $fa).as_bytes()).unwrap();
@@ -794,8 +796,8 @@ macro_rules! scad_file {
         });
         t.join().unwrap();
     };
-    ($path:expr, fn=$fn:expr, $($child:expr);+;) => {
-        let t = fat_thread!({
+    ($stack_size:expr, $path:expr, fn=$fn:expr, $($child:expr);+;) => {
+        let t = fat_thread!($stack_size, {
             let children = vec![$($child,)+];
             let mut file = std::fs::File::create($path).unwrap();
             file.write(format!("$fn={};\n", $fn).as_bytes()).unwrap();
@@ -807,8 +809,8 @@ macro_rules! scad_file {
         });
         t.join().unwrap();
     };
-    ($path:expr, fs=$fs:expr, $($child:expr);+;) => {
-        let t = fat_thread!({
+    ($stack_size:expr, $path:expr, fs=$fs:expr, $($child:expr);+;) => {
+        let t = fat_thread!($stack_size, {
             let children = vec![$($child,)+];
             let mut file = std::fs::File::create($path).unwrap();
             file.write(format!("$fs={};\n", $fs).as_bytes()).unwrap();
@@ -820,8 +822,8 @@ macro_rules! scad_file {
         });
         t.join().unwrap();
     };
-    ($path:expr, fa=$fa:expr, $($child:expr);+;) => {
-        let t = fat_thread!({
+    ($stack_size:expr, $path:expr, fa=$fa:expr, $($child:expr);+;) => {
+        let t = fat_thread!($stack_size, {
             let children = vec![$($child,)+];
             let mut file = std::fs::File::create($path).unwrap();
             file.write(format!("$fa={};\n", $fa).as_bytes()).unwrap();
@@ -833,8 +835,8 @@ macro_rules! scad_file {
         });
         t.join().unwrap();
     };
-    ($path:expr, $($child:expr);+;) => {
-        let t = fat_thread!({
+    ($stack_size:expr, $path:expr, $($child:expr);+;) => {
+        let t = fat_thread!($stack_size, {
             let children = vec![$($child,)+];
             let mut file = std::fs::File::create($path).unwrap();
             for child in children {

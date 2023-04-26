@@ -45,14 +45,14 @@ fn main() {
         viewer.add_bezier_star(&path);
         let mut small_viewer = Viewer::new(0.05, 0.025, 6);
         small_viewer.add_bezier_star(&profile);
-        scad_file!("output/bezier_star_sweep.scad",
+        scad_file!(32, "output/bezier_star_sweep.scad",
             small_viewer.into_scad() + viewer.into_scad();
         );
     } else {
         let path = Pt3s::from_pt3s(path.gen_points().iter().map(|p| p.as_pt3(0.0)).collect());
         let profile = profile.gen_points();
         let star_swept = Polyhedron::sweep(&profile, &path, 7.0 * 360.0, true);
-        scad_file!("output/bezier_star_sweep.scad",
+        scad_file!(32, "output/bezier_star_sweep.scad",
             star_swept.into_scad();
         );
     }

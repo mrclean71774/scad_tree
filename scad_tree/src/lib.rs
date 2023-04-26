@@ -176,13 +176,20 @@ pub type Faces = Paths;
 
 /// Runs a code block in a separate thread.
 ///
-/// The thread has a stack size of 32 megabytes to avoid stack overflow
-/// do to recursion. Automatically used by the scad_file macro.
+/// #params
+///
+/// stack_size: The size of the stack in megabytes.
+///
+/// code: The code block to run e.g. { code here }.
+///
+/// #patterns
+///
+/// fat_thread!('stack_size: usize', 'code: block')
 #[macro_export]
 macro_rules! fat_thread {
-    ($code:block) => {
+    ($stack_size:expr, $code:block) => {
         std::thread::Builder::new()
-            .stack_size(32 * 1024 * 1024)
+            .stack_size($stack_size * 1024 * 1024)
             .spawn(move || $code)
             .unwrap()
     };

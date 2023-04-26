@@ -41,7 +41,7 @@ fn main() {
 
     let mut viewer = Viewer::new(0.5, 0.25, 6);
     viewer.add_cubic_bezier_chain2d(&curve);
-    scad_file!("output/view_cubic_bezier_chain.scad",
+    scad_file!(32, "output/view_cubic_bezier_chain.scad",
         viewer.into_scad();
     );
 }

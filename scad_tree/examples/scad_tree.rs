@@ -57,7 +57,7 @@ fn main() {
 
     // This snippet of macro code produces the tree above but is a bit easier to read and write.
     // If you squint hard enough it resembles OpenSCAD code!
-    scad_file!(
+    scad_file!(32,
         "output/scad_tree2.scad",
         difference!(
             cube!(2.0);
