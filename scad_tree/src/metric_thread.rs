@@ -87,8 +87,6 @@ fn d_min_from_d_maj_pitch(d_maj: f64, pitch: f64) -> f64 {
 ///
 /// segments: The number of segments in a full revolution.
 ///
-/// lead_in: Add lead in on lower Z.
-///
 /// lead_in_degrees: The total angle of lead in.
 ///
 /// lead_out_degrees: The total angle of lead out.
@@ -425,11 +423,7 @@ fn threaded_cylinder(
 ///
 /// segments: The number of segments in a circle.
 ///
-/// lead_in: Tapers off the threads at the bottom of the rod.
-///
 /// lead_in_degrees: Span of the lead in.
-///
-/// lead_out: Tapers off the threads at the top of the rod.
 ///
 /// lead_out_degrees: Span of the lead out.
 ///
@@ -474,8 +468,6 @@ pub fn threaded_rod(
 /// head_height: The height of the hex head.
 ///
 /// segments: The number of segments in a circle.
-///
-/// lead_in: Tapers off the thread at the end.
 ///
 /// lead_in_degrees: The amount of degrees the tapered thread occupies.
 ///
