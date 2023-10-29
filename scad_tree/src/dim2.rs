@@ -44,19 +44,19 @@ pub fn circle(radius: f64, segments: u64) -> Pt2s {
     arc(Pt2::new(radius, 0.0), 360.0, segments)
 }
 
-/// Create an inscribed polygon.
+/// Create an circumscribed polygon.
 ///
 /// radius: the radius of the circle surrounding the polygon
-pub fn inscribed_polygon(n_sides: u64, radius: f64) -> Pt2s {
+pub fn circumscribed_polygon(n_sides: u64, radius: f64) -> Pt2s {
     circle(radius, n_sides)
 }
 
-/// Create a circumscribed polygon.
+/// Create a inscribed polygon.
 ///
 /// radius: the radius of the circle inside the polygon
-pub fn circumscribed_polygon(n_sides: u64, radius: f64) -> Pt2s {
+pub fn inscribed_polygon(n_sides: u64, radius: f64) -> Pt2s {
     let radius = radius / dcos(180.0 / n_sides as f64);
-    inscribed_polygon(n_sides, radius)
+    circumscribed_polygon(n_sides, radius)
 }
 
 /// Create a rectangle or square with rounded corners.
@@ -80,7 +80,16 @@ pub fn rounded_rect(width: f64, height: f64, radius: f64, segments: u64, center:
     tr
 }
 
-/// Creates a profile for chamfering edges.
+/// Creates a profile for chamfering edges at 45 degrees.
+///
+/// The profile is a triangle when oversize is zero. With
+/// oversize the profile is a square with a triangle removed.
+/// Extending the shape with oversize gives a cleaner preview
+/// in OpenSCAD.
+///
+/// size: The vertcal and horizontal size of the chamfer.
+///
+/// oversize: The size of the non-chamfer part.
 pub fn chamfer(size: f64, oversize: f64) -> Pt2s {
     Pt2s::from_pt2s(vec![
         Pt2::new(0.0, size + oversize),
