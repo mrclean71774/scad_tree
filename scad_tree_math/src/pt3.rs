@@ -21,7 +21,7 @@
 // SOFTWARE.
 //
 
-use crate::{dcos, dsin, Mt4, Pt4};
+use crate::{dcos, dsin, Mt4, Pt2s, Pt4};
 
 /// Wraps a `Vec<Pt3>`.
 #[derive(Clone, PartialEq)]
@@ -66,6 +66,14 @@ impl Pt3s {
 
     pub fn from_pt3s(pt3s: Vec<Pt3>) -> Self {
         Self { inner: pt3s }
+    }
+
+    pub fn from_pt2s(pt2s: &Pt2s, z: f64) -> Self {
+        let mut pt3s = Pt3s::with_capacity(pt2s.len());
+        for i in 0..pt2s.len() {
+            pt3s.push(pt2s[i].as_pt3(z));
+        }
+        Self { inner: pt3s.inner }
     }
 
     pub fn translate(&mut self, point: Pt3) {
