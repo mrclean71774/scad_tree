@@ -25,8 +25,9 @@
 use scad_tree::prelude::*;
 
 fn main() {
-    let segments: u64 = 36;
-    let slices: u64 = 12;
+    let segments: u64 = 72;
+    let cup_segments: u64 = 144;
+    let slices: u64 = 48;
 
     let mut cup_blank_profile = Pt2s::new();
     cup_blank_profile.push(Pt2::new(0.0, 0.0));
@@ -39,7 +40,7 @@ fn main() {
     ));
     cup_blank_profile.push(Pt2::new(0.0, 100.0));
 
-    let cup_blank = rotate_extrude!(angle=360.0, convexity=2, fn=segments,
+    let cup_blank = rotate_extrude!(angle=360.0, convexity=2, fn=cup_segments,
         polygon!(cup_blank_profile);
     );
 
@@ -54,7 +55,7 @@ fn main() {
     ));
     cup_inner_profile.push(Pt2::new(0.0, 103.0));
 
-    let cup_inner = rotate_extrude!(angle=360.0, convexity=1, fn=segments,
+    let cup_inner = rotate_extrude!(angle=360.0, convexity=1, fn=cup_segments,
         polygon!(cup_inner_profile);
     );
 
