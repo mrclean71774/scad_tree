@@ -27,6 +27,10 @@ use crate::{
 };
 
 /// The points and faces of a polyhedron.
+///
+/// Polyhedron exists so that meshes can be modified or created
+/// in Rust code. It also allows things that are not directly
+/// implemented in OpenSCAD like sweep and loft.
 #[derive(Clone)]
 pub struct Polyhedron {
     pub points: Pt3s,
@@ -82,7 +86,7 @@ impl Polyhedron {
             vertices.push(point.as_pt3(0.0));
         }
 
-        let mut faces = Faces::with_capacity((points.len() - 2) * 2 + points.len() - 1);
+        let mut faces = Faces::with_capacity((points.len() - 2) * 2 + points.len());
         for i in (0..indices.len()).step_by(3) {
             faces.push(Indices::from_indices(vec![
                 indices[i],
@@ -196,7 +200,60 @@ impl Polyhedron {
         Polyhedron { points, faces }
     }
 
+    /// Create a Polyhedron by connecting two 2D profiles.
+    ///
+    /// The profiles need to have the same number of vertices.
+    pub fn loft(lower_profile: &Pt2s, upper_profile: &Pt2s, height: f64) -> Self {
+        if lower_profile.len() != upper_profile.len() {
+            panic!(
+                "lower and upper profile lengths differ, lower len = {} and upper len = {}",
+                lower_profile.len(),
+                upper_profile.len()
+            );
+        }
+        let n_pts = lower_profile.len();
+        let mut points = Pt3s::with_capacity(n_pts * 2);
+        for pt in lower_profile.iter() {
+            points.push(pt.as_pt3(0.0));
+        }
+        for pt in upper_profile.iter() {
+            points.push(pt.as_pt3(height));
+        }
+
+        let mut faces = Faces::with_capacity((n_pts - 2) * 2 + n_pts);
+        let indices = triangulate2d_rev(lower_profile);
+        for i in (0..indices.len()).step_by(3) {
+            faces.push(Indices::from_indices(vec![
+                indices[i],
+                indices[i + 1],
+                indices[i + 2],
+            ]));
+        }
+
+        let indices = triangulate2d(upper_profile);
+        for i in (0..indices.len()).step_by(3) {
+            faces.push(Indices::from_indices(vec![
+                indices[i] + n_pts as u64,
+                indices[i + 1] + n_pts as u64,
+                indices[i + 2] + n_pts as u64,
+            ]));
+        }
+
+        for i in 0..n_pts {
+            faces.push(Indices::from_indices(vec![
+                i as u64,
+                ((i + 1) % n_pts) as u64,
+                ((i + 1) % n_pts + n_pts) as u64,
+                (i + n_pts) as u64,
+            ]));
+        }
+
+        Polyhedron { points, faces }
+    }
+
     /// Sweeps a 2D profile along a path of 3D points to make a polyhedron.
+    ///
+    /// If closed is true then twist_degrees should be a multiple of 360.
     pub fn sweep(profile: &Pt2s, path: &Pt3s, twist_degrees: f64, closed: bool) -> Self {
         let profile = Pt3s::from_pt3s(profile.iter().map(|p| p.as_pt3(0.0)).collect());
         let profile_len = profile.len();
