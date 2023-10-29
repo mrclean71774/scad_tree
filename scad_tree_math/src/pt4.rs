@@ -64,8 +64,8 @@ impl Pt4s {
         }
     }
 
-    pub fn from_pt4s(pt2s: Vec<Pt4>) -> Self {
-        Self { inner: pt2s }
+    pub fn from_pt4s(pt4s: Vec<Pt4>) -> Self {
+        Self { inner: pt4s }
     }
 }
 

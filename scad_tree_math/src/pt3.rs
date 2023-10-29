@@ -64,8 +64,8 @@ impl Pt3s {
         }
     }
 
-    pub fn from_pt3s(pt2s: Vec<Pt3>) -> Self {
-        Self { inner: pt2s }
+    pub fn from_pt3s(pt3s: Vec<Pt3>) -> Self {
+        Self { inner: pt3s }
     }
 
     pub fn translate(&mut self, point: Pt3) {
