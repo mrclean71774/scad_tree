@@ -44,19 +44,19 @@ pub fn circle(radius: f64, segments: u64) -> Pt2s {
     arc(Pt2::new(radius, 0.0), 360.0, segments)
 }
 
-/// Create an circumscribed polygon.
+/// Create an inscribed polygon.
 ///
 /// radius: the radius of the circle surrounding the polygon
-pub fn circumscribed_polygon(n_sides: u64, radius: f64) -> Pt2s {
+pub fn inscribed_polygon(n_sides: u64, radius: f64) -> Pt2s {
     circle(radius, n_sides)
 }
 
-/// Create a inscribed polygon.
+/// Create a circumscribed polygon.
 ///
 /// radius: the radius of the circle inside the polygon
-pub fn inscribed_polygon(n_sides: u64, radius: f64) -> Pt2s {
+pub fn circumscribed_polygon(n_sides: u64, radius: f64) -> Pt2s {
     let radius = radius / dcos(180.0 / n_sides as f64);
-    circumscribed_polygon(n_sides, radius)
+    inscribed_polygon(n_sides, radius)
 }
 
 /// Create a rectangle or square with rounded corners.
