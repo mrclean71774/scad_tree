@@ -45,12 +45,12 @@ pub mod prelude {
     pub use {
         crate::{
             circle, color, cube, cylinder, difference, dim2, dim3, fat_thread, hull, import,
-            intersection, linear_extrude, metric_thread, minkowski, mirror, polygon, polyhedron,
-            projection, resize, rotate, rotate_extrude, scad_file, scale, sphere, square, surface,
-            text, translate, union, BezierStar, CubicBezier2D, CubicBezier3D, CubicBezierChain2D,
-            CubicBezierChain3D, Faces, Indices, Paths, Pipe, Polyhedron, Pt2, Pt2s, Pt3, Pt3s, Pt4,
-            QuadraticBezier2D, QuadraticBezier3D, Scad, ScadColor, ScadOp, TextDirection,
-            TextHalign, TextParams, TextValign, Viewer,
+            intersection, linear_extrude, metric_thread, minkowski, mirror, offset, polygon,
+            polyhedron, projection, resize, rotate, rotate_extrude, scad_file, scale, sphere,
+            square, surface, text, translate, union, BezierStar, CubicBezier2D, CubicBezier3D,
+            CubicBezierChain2D, CubicBezierChain3D, Faces, Indices, Paths, Pipe, Polyhedron, Pt2,
+            Pt2s, Pt3, Pt3s, Pt4, QuadraticBezier2D, QuadraticBezier3D, Scad, ScadColor, ScadOp,
+            TextDirection, TextHalign, TextParams, TextValign, Viewer,
         },
         std::io::Write,
     };
