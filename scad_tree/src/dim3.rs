@@ -127,7 +127,7 @@ impl Polyhedron {
     ///
     /// Most of the time you want the rotate_extrude macro instead of this.
     pub fn rotate_extrude(profile: &Pt2s, degrees: f64, segments: usize) -> Self {
-        assert!(degrees >= 0.0 && degrees <= 360.0);
+        assert!((0.0..360.0).contains(&degrees));
         assert!(segments >= 3);
         let not_closed = degrees != 360.0;
         let profile: Pt3s =
