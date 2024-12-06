@@ -30,7 +30,7 @@ use crate::{approx_eq, Indices, Pt2, Pt2s, Pt3, Pt3s};
 /// pts: The points of the polygon.
 ///
 /// return: True if ccw else false.
-pub fn is_ccw(pts: &Vec<(u64, Pt2)>) -> bool {
+pub fn is_ccw(pts: &[(u64, Pt2)]) -> bool {
     (pts[1].1.x - pts[0].1.x) * (pts[2].1.y - pts[0].1.y)
         - (pts[2].1.x - pts[0].1.x) * (pts[1].1.y - pts[0].1.y)
         > 0.0
@@ -268,14 +268,14 @@ fn triangulate(mut polygon: Vec<(u64, Pt2)>) -> Indices {
     let mut left = polygon[0].1;
     let mut index = 0usize;
 
-    for i in 0..polygon.len() {
+    (0..polygon.len()).for_each(|i| {
         if polygon[i].1.x < left.x
             || (approx_eq(polygon[i].1.x, left.x, 1.0e-5) && polygon[i].1.y < left.y)
         {
             index = i;
             left = polygon[i].1;
         }
-    }
+    });
 
     let tri = vec![
         polygon[if index == 0 {
