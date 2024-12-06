@@ -304,8 +304,8 @@ impl CubicBezierChain2D {
             start: chain_end.end,
             control1: chain_end.end
                 + (chain_end.end - chain_end.control2).normalized() * control1_length,
-            control2: control2,
-            end: end,
+            control2,
+            end,
             segments,
         });
         self
