@@ -1,6 +1,6 @@
 [package]
 name = "scad_tree"
-version = "0.4.1"
+version = "0.4.2"
 edition = "2021"
 description = "Generate OpenSCAD code from Rust."
 license = "MIT"
