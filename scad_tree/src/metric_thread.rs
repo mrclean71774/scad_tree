@@ -52,7 +52,7 @@ fn m_table_lookup(m: i32) -> HashMap<&'static str, f64> {
         }
         m -= 1;
     }
-    return m_table[&m].clone();
+    m_table[&m].clone()
 }
 
 /// Calculates the thread height from the given pitch.
@@ -96,6 +96,7 @@ fn d_min_from_d_maj_pitch(d_maj: f64, pitch: f64) -> f64 {
 /// center: Center vertically.
 ///
 /// return: The threaded cylinder.
+#[allow(clippy::too_many_arguments)]
 fn threaded_cylinder(
     d_min: f64,
     d_maj: f64,
@@ -295,26 +296,14 @@ fn threaded_cylinder(
                 5 + index_offset,
                 3 + index_offset,
             ]);
-            indices.append(&mut vec![
-                1 + index_offset,
-                4 + index_offset,
-                0 + index_offset,
-            ]);
+            indices.append(&mut vec![1 + index_offset, 4 + index_offset, index_offset]);
             indices.append(&mut vec![
                 5 + index_offset,
                 4 + index_offset,
                 1 + index_offset,
             ]);
-            indices.append(&mut vec![
-                0 + index_offset,
-                6 + index_offset,
-                2 + index_offset,
-            ]);
-            indices.append(&mut vec![
-                4 + index_offset,
-                6 + index_offset,
-                0 + index_offset,
-            ]);
+            indices.append(&mut vec![index_offset, 6 + index_offset, 2 + index_offset]);
+            indices.append(&mut vec![4 + index_offset, 6 + index_offset, index_offset]);
             indices.append(&mut vec![
                 2 + index_offset,
                 7 + index_offset,
@@ -336,26 +325,14 @@ fn threaded_cylinder(
                 5 + index_offset,
                 7 + index_offset,
             ]);
-            indices.append(&mut vec![
-                0 + index_offset,
-                4 + index_offset,
-                1 + index_offset,
-            ]);
+            indices.append(&mut vec![index_offset, 4 + index_offset, 1 + index_offset]);
             indices.append(&mut vec![
                 1 + index_offset,
                 4 + index_offset,
                 5 + index_offset,
             ]);
-            indices.append(&mut vec![
-                2 + index_offset,
-                6 + index_offset,
-                0 + index_offset,
-            ]);
-            indices.append(&mut vec![
-                0 + index_offset,
-                6 + index_offset,
-                4 + index_offset,
-            ]);
+            indices.append(&mut vec![2 + index_offset, 6 + index_offset, index_offset]);
+            indices.append(&mut vec![index_offset, 6 + index_offset, 4 + index_offset]);
             indices.append(&mut vec![
                 3 + index_offset,
                 7 + index_offset,
@@ -405,7 +382,7 @@ fn threaded_cylinder(
     let convexity = (length / pitch) as u64 + 1;
     let threads = polyhedron!(Pt3s::from_pt3s(vertices), faces, convexity);
 
-    let rod = Polyhedron::cylinder(d_min / 2.0 + 0.0001, length, segments as u64).into_scad();
+    let rod = Polyhedron::cylinder(d_min / 2.0 + 0.0001, length, segments).into_scad();
 
     let mut result = threads + rod;
 
@@ -478,6 +455,7 @@ pub fn threaded_rod(
 /// center: Center vertically.
 ///
 /// return: The hex bolt.
+#[allow(clippy::too_many_arguments)]
 pub fn hex_bolt(
     m: i32,
     length: f64,
