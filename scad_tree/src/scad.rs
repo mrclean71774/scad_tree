@@ -237,7 +237,7 @@ impl Scad {
     pub fn save(&self, path: &str) {
         let s = format!("{}", self);
         let mut file = std::fs::File::create(path).unwrap();
-        file.write(s.as_bytes()).unwrap();
+        file.write_all(s.as_bytes()).unwrap();
         file.flush().unwrap();
     }
 }
@@ -263,13 +263,13 @@ impl std::fmt::Display for Scad {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match &self.op {
             ScadOp::Union => {
-                write!(f, "union() {{\n")?;
+                writeln!(f, "union() {{")?;
             }
             ScadOp::Difference => {
-                write!(f, "difference() {{\n")?;
+                writeln!(f, "difference() {{")?;
             }
             ScadOp::Intersection => {
-                write!(f, "intersection() {{\n")?;
+                writeln!(f, "intersection() {{")?;
             }
             ScadOp::Circle {
                 radius,
@@ -345,7 +345,7 @@ impl std::fmt::Display for Scad {
                 write!(f, "import({:?}, {});", file, convexity)?;
             }
             ScadOp::Projection { cut } => {
-                write!(f, "projection(cut={}) {{\n", cut)?;
+                writeln!(f, "projection(cut={}) {{", cut)?;
             }
             ScadOp::Sphere {
                 radius,
@@ -424,7 +424,7 @@ impl std::fmt::Display for Scad {
                 if let Some(fn_) = fn_ {
                     write!(f, ", $fn={}", fn_)?;
                 }
-                write!(f, ") {{\n")?;
+                writeln!(f, ") {{")?;
             }
             ScadOp::RotateExtrude {
                 angle,
@@ -443,7 +443,7 @@ impl std::fmt::Display for Scad {
                 if let Some(fn_) = fn_ {
                     write!(f, ", $fn={}", fn_)?;
                 }
-                write!(f, ") {{\n")?;
+                writeln!(f, ") {{")?;
             }
             ScadOp::Surface {
                 file,
@@ -458,21 +458,21 @@ impl std::fmt::Display for Scad {
                 )?;
             }
             ScadOp::Translate { v } => {
-                write!(f, "translate(v={}) {{\n", v)?;
+                writeln!(f, "translate(v={}) {{", v)?;
             }
             ScadOp::Rotate { a, a_is_scalar, v } => {
                 if let Some(a) = a {
                     if *a_is_scalar {
-                        write!(f, "rotate(a={}) {{\n", a)?;
+                        writeln!(f, "rotate(a={}) {{", a)?;
                     } else {
-                        write!(f, "rotate(a={}, v={}) {{\n", a, v)?;
+                        writeln!(f, "rotate(a={}, v={}) {{", a, v)?;
                     }
                 } else {
-                    write!(f, "rotate(a={}) {{\n", v)?;
+                    writeln!(f, "rotate(a={}) {{", v)?;
                 }
             }
             ScadOp::Scale { v } => {
-                write!(f, "scale(v={}) {{\n", v)?;
+                writeln!(f, "scale(v={}) {{", v)?;
             }
             ScadOp::Resize {
                 newsize,
@@ -482,21 +482,21 @@ impl std::fmt::Display for Scad {
                 convexity,
             } => {
                 if *auto_is_vec {
-                    write!(
+                    writeln!(
                         f,
-                        "resize(newsize={}, auto={}, convexity={}) {{\n",
+                        "resize(newsize={}, auto={}, convexity={}) {{",
                         newsize, auto, convexity
                     )?;
                 } else {
-                    write!(
+                    writeln!(
                         f,
-                        "resize(newsize={}, auto=[{}, {}, {}], convexity={}) {{\n",
+                        "resize(newsize={}, auto=[{}, {}, {}], convexity={}) {{",
                         newsize, autovec.0, autovec.1, autovec.2, convexity
                     )?;
                 }
             }
             ScadOp::Mirror { v } => {
-                write!(f, "mirror(v={}) {{\n", v)?;
+                writeln!(f, "mirror(v={}) {{", v)?;
             }
             ScadOp::Color {
                 rgba,
@@ -505,38 +505,38 @@ impl std::fmt::Display for Scad {
                 alpha,
             } => {
                 if let Some(rgba) = rgba {
-                    write!(f, "color(c={}) {{\n", rgba)?;
+                    writeln!(f, "color(c={}) {{", rgba)?;
                 } else if let Some(color) = color {
                     write!(f, "color(\"{:?}\"", color)?;
                     if let Some(alpha) = alpha {
                         write!(f, ", alpha={}", alpha)?;
                     }
-                    write!(f, ") {{\n")?;
+                    writeln!(f, ") {{")?;
                 } else if let Some(hex) = hex {
-                    write!(f, "color({:?}) {{\n", hex)?;
+                    writeln!(f, "color({:?}) {{", hex)?;
                 }
             }
             ScadOp::Offset { r, delta, chamfer } => {
                 if let Some(r) = r {
-                    write!(f, "offset(r={}) {{\n", r)?;
+                    writeln!(f, "offset(r={}) {{", r)?;
                 } else if let Some(delta) = delta {
-                    write!(f, "offset(delta={}, chamfer={}) {{\n", delta, chamfer)?;
+                    writeln!(f, "offset(delta={}, chamfer={}) {{", delta, chamfer)?;
                 }
             }
             ScadOp::Hull => {
-                write!(f, "hull() {{\n")?;
+                writeln!(f, "hull() {{")?;
             }
             ScadOp::Minkowski { convexity } => {
-                write!(f, "minkowski(convexity={}) {{\n", convexity)?;
+                writeln!(f, "minkowski(convexity={}) {{", convexity)?;
             }
         } // end match
         for i in 0..self.children.len() {
             write!(f, "{}", self.children[i])?;
         }
-        if self.children.len() > 0 {
+        if !self.children.is_empty() {
             write!(f, "}}")?;
         }
-        write!(f, "\n")
+        writeln!(f)
     }
 }
 
@@ -786,11 +786,11 @@ macro_rules! scad_file {
         let t = fat_thread!($stack_size, {
             let children = vec![$($child,)+];
             let mut file = std::fs::File::create($path).unwrap();
-            file.write(format!("$fa={};\n", $fa).as_bytes()).unwrap();
-            file.write(format!("$fs={};\n", $fs).as_bytes()).unwrap();
+            file.write_all(format!("$fa={};\n", $fa).as_bytes()).unwrap();
+            file.write_all(format!("$fs={};\n", $fs).as_bytes()).unwrap();
             for child in children {
                 let s = format!("{}", child);
-                file.write(s.as_bytes()).unwrap();
+                file.write_all(s.as_bytes()).unwrap();
             }
             file.flush().unwrap();
         });
@@ -800,10 +800,10 @@ macro_rules! scad_file {
         let t = fat_thread!($stack_size, {
             let children = vec![$($child,)+];
             let mut file = std::fs::File::create($path).unwrap();
-            file.write(format!("$fn={};\n", $fn).as_bytes()).unwrap();
+            file.write_all(format!("$fn={};\n", $fn).as_bytes()).unwrap();
             for child in children {
                 let s = format!("{}", child);
-                file.write(s.as_bytes()).unwrap();
+                file.write_all(s.as_bytes()).unwrap();
             }
             file.flush().unwrap();
         });
@@ -813,10 +813,10 @@ macro_rules! scad_file {
         let t = fat_thread!($stack_size, {
             let children = vec![$($child,)+];
             let mut file = std::fs::File::create($path).unwrap();
-            file.write(format!("$fs={};\n", $fs).as_bytes()).unwrap();
+            file.write_all(format!("$fs={};\n", $fs).as_bytes()).unwrap();
             for child in children {
                 let s = format!("{}", child);
-                file.write(s.as_bytes()).unwrap();
+                file.write_all(s.as_bytes()).unwrap();
             }
             file.flush().unwrap();
         });
@@ -826,10 +826,10 @@ macro_rules! scad_file {
         let t = fat_thread!($stack_size, {
             let children = vec![$($child,)+];
             let mut file = std::fs::File::create($path).unwrap();
-            file.write(format!("$fa={};\n", $fa).as_bytes()).unwrap();
+            file.write_all(format!("$fa={};\n", $fa).as_bytes()).unwrap();
             for child in children {
                 let s = format!("{}", child);
-                file.write(s.as_bytes()).unwrap();
+                file.write_all(s.as_bytes()).unwrap();
             }
             file.flush().unwrap();
         });
@@ -841,7 +841,7 @@ macro_rules! scad_file {
             let mut file = std::fs::File::create($path).unwrap();
             for child in children {
                 let s = format!("{}", child);
-                file.write(s.as_bytes()).unwrap();
+                file.write_all(s.as_bytes()).unwrap();
             }
             file.flush().unwrap();
         });
@@ -3582,7 +3582,7 @@ mod tests {
             polygon
                 == Scad {
                     op: ScadOp::Polygon {
-                        points: points,
+                        points,
                         paths: None,
                         convexity: 1
                     },
@@ -3610,7 +3610,7 @@ mod tests {
             polygon
                 == Scad {
                     op: ScadOp::Polygon {
-                        points: points,
+                        points,
                         paths: Some(paths),
                         convexity: 1
                     },
@@ -3638,7 +3638,7 @@ mod tests {
             polygon
                 == Scad {
                     op: ScadOp::Polygon {
-                        points: points,
+                        points,
                         paths: Some(paths),
                         convexity: 2
                     },
@@ -3659,7 +3659,7 @@ mod tests {
             polygon
                 == Scad {
                     op: ScadOp::Polygon {
-                        points: points,
+                        points,
                         paths: None,
                         convexity: 2
                     },
