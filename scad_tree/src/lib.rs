@@ -70,7 +70,7 @@ pub use {
 };
 
 /// Wraps a `Vec<u64>`.
-#[derive(Clone, PartialEq)]
+#[derive(Clone, PartialEq, Default)]
 pub struct Indices {
     inner: Vec<u64>,
 }
@@ -114,7 +114,7 @@ impl Indices {
 /// Paths wrap a `Vec<Indices>`.
 ///
 /// Used for polygon macro. Faces is an alias used for polyhedron macro.
-#[derive(Clone, PartialEq)]
+#[derive(Clone, PartialEq, Default)]
 pub struct Paths {
     inner: Vec<Indices>,
 }
