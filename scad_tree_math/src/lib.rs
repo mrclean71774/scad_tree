@@ -55,20 +55,20 @@ pub fn dtan(degrees: f64) -> f64 {
 
 /// Returns the arc-sine of degrees
 #[inline(always)]
-pub fn dasin(degrees: f64) -> f64 {
-    degrees.to_radians().asin()
+pub fn dasin(val: f64) -> f64 {
+    val.asin().to_degrees()
 }
 
 /// Returns the arc-cosine of degrees
 #[inline(always)]
-pub fn dacos(degrees: f64) -> f64 {
-    degrees.to_radians().acos()
+pub fn dacos(val: f64) -> f64 {
+    val.acos().to_degrees()
 }
 
 /// Returns the arc-tangent of degrees
 #[inline(always)]
-pub fn datan(degrees: f64) -> f64 {
-    degrees.to_radians().atan()
+pub fn datan(val: f64) -> f64 {
+    val.atan().to_degrees()
 }
 
 /// Returns true if a and b are within epsilon
